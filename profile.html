@@ -152,16 +152,19 @@ textarea:focus{border-color:var(--indigo);outline:0}
 </style></head><body>
 <header><div class="wrap"><a class="logo" href="index.html">Streez<b>ier</b></a>
 <form class="sform" id="sform" role="search"><input id="q" type="search" placeholder="Search for kitchen, home or car accessories" aria-label="Search products"><button type="submit">Search</button></form>
-<nav><a href="index.html">About</a><a href="home.html">Home</a><a href="profile.html" class="on">Profile</a><a href="cart.html">🛒<span class="badge" id="count" hidden>0</span></a></nav></div></header>
+<nav><a href="index.html">About</a><a href="home.html">Home</a><a href="profile.html" class="on">Profile</a><a href="cart.html" class="">🛒<span class="badge" id="count" hidden>0</span></a></nav></div></header>
 <div class="banner"><div class="wrap bwrap"><div><div class="avatar" id="avatar">👤</div><h2 id="hello">Welcome to Streezier</h2><p id="bsub">Log in or create an account.</p></div><button class="btn sun" id="logout" data-logout hidden>Log out</button></div></div>
 <main class="wrap">
-<div id="authView" class="authbox"><div class="notice" id="notice" hidden>Please log in or sign up to place your order.</div>
+<div class="notice" id="fileWarn" hidden style="margin-top:20px">Accounts only work when the website is online (or on a local test server). Opening this file directly from your computer will not work for login.</div>
+<p class="empty" id="loading">Loading…</p>
+<div id="authView" class="authbox" hidden><div class="notice" id="notice" hidden>Please log in or sign up to place your order.</div>
 <div class="panel"><div class="filters" style="margin-top:0"><button class="chip on" data-mode="login">Log in</button><button class="chip" data-mode="signup">Sign up</button></div>
 <form id="loginForm" novalidate><h3>Log in</h3>
-<label for="liUser">Username</label><input id="liUser" autocomplete="username" autocapitalize="none"><div class="err" id="eliUser"></div>
-<label for="liPass">Password</label><input id="liPass" type="password" autocomplete="current-password"><div class="err" id="eliPass"></div>
+<label for="liEmail">Email</label><input id="liEmail" type="email" autocomplete="email"><div class="err" id="eliEmail"></div>
+<label for="liPass">Password</label><input id="liPass" type="password" autocomplete="current-password"><div class="err" id="eliPass"></div><div class="cmsg ok" id="eliInfo"></div>
 <label class="chk"><input type="checkbox" data-show="liPass"> Show password</label>
-<button class="btn" type="submit" style="width:100%;margin-top:14px">Log in</button></form>
+<button class="btn" type="submit" id="liBtn" style="width:100%;margin-top:14px">Log in</button>
+<p style="text-align:center;margin:12px 0 0"><button class="link" type="button" data-forgot style="color:var(--indigo)">Forgot password?</button></p></form>
 <form id="signupForm" novalidate hidden><h3>Create your account</h3>
 <label for="suUser">Choose a username</label><input id="suUser" autocomplete="username" autocapitalize="none" placeholder="e.g. ravi_kumar"><div class="err" id="esuUser"></div>
 <label for="suEmail">Email (required)</label><input id="suEmail" type="email" autocomplete="email" placeholder="you@example.com"><div class="err" id="esuEmail"></div>
@@ -169,93 +172,137 @@ textarea:focus{border-color:var(--indigo);outline:0}
 <label for="suAddr">Address</label><textarea id="suAddr" autocomplete="street-address" placeholder="House / flat no., street, area, landmark, city, state, PIN code"></textarea><div class="err" id="esuAddr"></div>
 <label for="suPass">Password</label><input id="suPass" type="password" autocomplete="new-password" placeholder="At least 6 characters"><div class="err" id="esuPass"></div>
 <label class="chk"><input type="checkbox" data-show="suPass"> Show password</label>
-<button class="btn" type="submit" style="width:100%;margin-top:14px">Save &amp; create account</button></form>
-<p class="note">🔒 Your account is saved in this browser on this device. Use the same device and browser to log in again.</p></div></div>
+<div class="err" id="esuGen"></div>
+<button class="btn" type="submit" id="suBtn" style="width:100%;margin-top:14px">Save &amp; create account</button></form>
+<p class="note">🔒 Your account is stored securely online, so you can log in from any device.</p></div></div>
 <div id="accView" hidden><div class="filters" style="margin-top:0"><button class="chip on" data-tab="orders">Order history</button><button class="chip" data-tab="details">My details</button></div><div class="panel" id="tabBody"></div></div>
 </main>
 <footer><div class="wrap">© Streezier · Free shipping over Rs. 1499 · 7-day returns · 1000+ orders every month · support.streezier@gmail.com</div></footer>
-<script>
-const USERS="streezier_users",SESSION="streezier_session",ORDERS="streezier_orders",CART="streezier_cart";
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,updateProfile,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,collection,query,where,getDocs,writeBatch} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyCjp4e3qn_jrMizceBD62a4SuF0wUUeahM",authDomain:"streezier.firebaseapp.com",projectId:"streezier",storageBucket:"streezier.firebasestorage.app",messagingSenderId:"842549278881",appId:"1:842549278881:web:fddf40dd711fd38066d8e0",measurementId:"G-3FGNLJ1302"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const CART="streezier_cart";
 const $=s=>document.querySelector(s);
 const money=n=>"Rs. "+Number(n).toLocaleString("en-IN");
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
-const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const next=new URLSearchParams(location.search).get("next");
-let tab="orders";
-const users=()=>read(USERS,{});
-const current=()=>{const k=read(SESSION,null);return k?users()[k]||null:null};
+let tab="orders",user=null,profile=null,busy=false,ready=false;
+const msg=e=>({"auth/invalid-credential":"Incorrect email or password.","auth/wrong-password":"Incorrect email or password.","auth/user-not-found":"Incorrect email or password.","auth/invalid-email":"Please enter a valid email address.","auth/email-already-in-use":"An account with this email already exists.","auth/weak-password":"Password must be at least 6 characters.","auth/too-many-requests":"Too many attempts. Please wait a few minutes and try again.","auth/network-request-failed":"Network problem. Please check your internet and try again.","auth/operation-not-supported-in-this-environment":"Login only works when the website is opened online."}[e&&e.code]||"Something went wrong. Please try again.");
 function cleanPhone(v){
  let d=v.replace(/[^\d+]/g,"");
  if(/^\+?91\d{10}$/.test(d))d=d.slice(-10);else if(/^0\d{10}$/.test(d))d=d.slice(1);
  return d;
 }
-/* Passwords are never stored as plain text: they are salted and hashed (PBKDF2).
-   NOTE: this site has no server, so accounts live in the visitor's own browser.
-   For real accounts that work on every device, connect a backend (e.g. Firebase or Supabase). */
-const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
-const newSalt=()=>{const a=new Uint8Array(16);(window.crypto||{getRandomValues:x=>x.map(()=>Math.random()*256)}).getRandomValues(a);return hex(a)};
-async function hashPw(pw,salt){
- const c=window.crypto;
- if(c&&c.subtle){
-  const k=await c.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveBits"]);
-  return hex(await c.subtle.deriveBits({name:"PBKDF2",salt:new TextEncoder().encode(salt),iterations:100000,hash:"SHA-256"},k,256));
- }
- let h=5381;for(const ch of salt+pw)h=((h<<5)+h+ch.charCodeAt(0))|0;return "w"+h; // weak fallback for very old browsers
-}
 function cartCount(){
  const n=Object.values(read(CART,{})).reduce((a,p)=>a+p.qty,0),b=$("#count");b.textContent=n;b.hidden=!n;
 }
+function orderCard(x){
+ return `<div class="order"><div class="ohead"><div><strong>${esc(x.id)}</strong><br><span>${esc(x.date)}</span></div><div class="ototal">${money(x.total)}</div></div><div class="oitems">${x.items.map(p=>`<div>${p.qty} × ${esc(p.name)}</div>`).join("")}</div><div class="oaddr">Delivery fee: ${x.fee?money(x.fee):"FREE"}${x.disc?` · Coupon ${esc(x.coupon||"")}: − ${money(x.disc)}`:""}<br>To: ${esc(x.name)}, ${esc(x.address)}</div><span class="pill">Order placed</span></div>`;
+}
+async function showOrders(){
+ $("#tabBody").innerHTML=`<h3>Order history</h3><div class="empty">Loading your orders…</div>`;
+ let html;
+ try{
+  const s=await getDocs(query(collection(db,"orders"),where("uid","==",user.uid)));
+  const o=s.docs.map(d=>d.data()).sort((a,b)=>b.ts-a.ts);
+  html=o.length?o.map(orderCard).join(""):`<div class="empty">📦<br>No orders yet.<br><br><a class="btn" href="home.html">Start shopping</a></div>`;
+ }catch(e){html=`<div class="empty">Sorry, we couldn't load your orders. Please refresh and try again.</div>`}
+ if(tab=="orders"&&user)$("#tabBody").innerHTML=`<h3>Order history</h3>`+html;
+}
 function render(){
- const a=current();
- $("#authView").hidden=!!a;$("#accView").hidden=!a;$("#logout").hidden=!a;
+ $("#loading").hidden=ready;
+ const a=ready&&user&&profile;
+ $("#authView").hidden=!ready||!!a;$("#accView").hidden=!a;$("#logout").hidden=!a;
  $("#notice").hidden=next!="cart"||!!a;
  if(!a){$("#avatar").textContent="👤";$("#hello").textContent="Welcome to Streezier";$("#bsub").textContent="Log in or create an account.";return}
- $("#avatar").textContent=a.username[0].toUpperCase();$("#hello").textContent="@"+a.username;$("#bsub").textContent=a.email;
+ $("#avatar").textContent=profile.username[0].toUpperCase();$("#hello").textContent="@"+profile.username;$("#bsub").textContent=profile.email;
  document.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("on",b.dataset.tab==tab));
  if(tab=="details"){
-  $("#tabBody").innerHTML=`<h3>My details</h3><div class="det"><div><span>Username</span><b>@${esc(a.username)}</b></div><div><span>Email</span><b>${esc(a.email)}</b></div><div><span>Phone</span><b>${esc(a.phone||"Not added")}</b></div><div><span>Address</span><b>${esc(a.address||"Not added")}</b></div><div><span>Member since</span><b>${new Date(a.created).toLocaleDateString("en-IN")}</b></div></div>`;
- }else{
-  const o=read(ORDERS,[]).filter(x=>x.user===a.key);
-  $("#tabBody").innerHTML=`<h3>Order history</h3>`+(o.length?o.map(x=>`<div class="order"><div class="ohead"><div><strong>${esc(x.id)}</strong><br><span>${esc(x.date)}</span></div><div class="ototal">${money(x.total)}</div></div><div class="oitems">${x.items.map(p=>`<div>${p.qty} × ${esc(p.name)}</div>`).join("")}</div><div class="oaddr">Delivery fee: ${x.fee?money(x.fee):"FREE"}${x.disc?` · Coupon ${esc(x.coupon||"")}: − ${money(x.disc)}`:""}<br>To: ${esc(x.name)}, ${esc(x.address)}</div><span class="pill">Order placed</span></div>`).join(""):`<div class="empty">📦<br>No orders yet.<br><br><a class="btn" href="home.html">Start shopping</a></div>`);
- }
+  $("#tabBody").innerHTML=`<h3>My details</h3><div class="det"><div><span>Username</span><b>@${esc(profile.username)}</b></div><div><span>Email</span><b>${esc(profile.email)}</b></div><div><span>Phone</span><b>${esc(profile.phone||"Not added")}</b></div><div><span>Address</span><b>${esc(profile.address||"Not added")}</b></div><div><span>Member since</span><b>${profile.created?new Date(profile.created).toLocaleDateString("en-IN"):"-"}</b></div></div>`;
+ }else showOrders();
 }
-function done(key){write(SESSION,key);if(next=="cart")location="cart.html";else{tab="orders";cartCount();render();window.scrollTo(0,0)}}
 function setMode(m){
  $("#loginForm").hidden=m!="login";$("#signupForm").hidden=m!="signup";
  document.querySelectorAll("[data-mode]").forEach(b=>b.classList.toggle("on",b.dataset.mode==m));
 }
+onAuthStateChanged(auth,async u=>{
+ if(busy)return;
+ user=u;profile=null;
+ if(u){
+  try{const s=await getDoc(doc(db,"users",u.uid));profile=s.exists()?s.data():null}catch(e){}
+  if(!profile)profile={username:u.displayName||(u.email||"user").split("@")[0],email:u.email,phone:"",address:""};
+ }
+ ready=true;
+ if(u&&next=="cart"){location="cart.html";return}
+ render();
+});
 $("#signupForm").onsubmit=async e=>{
  e.preventDefault();
- const un=$("#suUser").value.trim(),key=un.toLowerCase(),em=$("#suEmail").value.trim(),phRaw=$("#suPhone").value.trim(),ph=cleanPhone(phRaw),ad=$("#suAddr").value.trim(),pw=$("#suPass").value,all=users();
- const eu=!/^[A-Za-z0-9._]{3,20}$/.test(un)?"Use 3-20 letters, numbers, dots or underscores.":all[key]?"This username is already taken. Please choose a different one.":"";
- const ee=!/^\S+@\S+\.\S+$/.test(em)?"Please enter a valid email address.":Object.values(all).some(u=>u.email.toLowerCase()==em.toLowerCase())?"An account with this email already exists.":"";
+ const un=$("#suUser").value.trim(),key=un.toLowerCase(),em=$("#suEmail").value.trim(),phRaw=$("#suPhone").value.trim(),ph=cleanPhone(phRaw),ad=$("#suAddr").value.trim(),pw=$("#suPass").value;
+ const eu=!/^[A-Za-z0-9._]{3,20}$/.test(un)?"Use 3-20 letters, numbers, dots or underscores.":"";
+ const ee=!/^\S+@\S+\.\S+$/.test(em)?"Please enter a valid email address.":"";
  const ep=phRaw&&!/^[6-9]\d{9}$/.test(ph)?"Please enter a valid 10-digit mobile number.":"";
  const ea=ad&&(ad.length<15?"Please enter your complete address.":!/\b\d{6}\b/.test(ad)?"Please include your 6-digit PIN code.":"");
  const ew=pw.length<6?"Password must be at least 6 characters.":"";
- $("#esuUser").textContent=eu;$("#esuEmail").textContent=ee;$("#esuPhone").textContent=ep;$("#esuAddr").textContent=ea||"";$("#esuPass").textContent=ew;
+ $("#esuUser").textContent=eu;$("#esuEmail").textContent=ee;$("#esuPhone").textContent=ep;$("#esuAddr").textContent=ea||"";$("#esuPass").textContent=ew;$("#esuGen").textContent="";
  if(eu||ee||ep||ea||ew)return;
- const salt=newSalt();
- all[key]={key,username:un,email:em,phone:ph,address:ad,salt,hash:await hashPw(pw,salt),created:Date.now()};
- write(USERS,all);done(key);
+ const btn=$("#suBtn");btn.disabled=true;btn.textContent="Creating account…";
+ const reset=()=>{btn.disabled=false;btn.textContent="Save & create account";busy=false};
+ try{
+  if((await getDoc(doc(db,"usernames",key))).exists()){$("#esuUser").textContent="This username is already taken. Please choose a different one.";return reset()}
+  busy=true;
+  const cred=await createUserWithEmailAndPassword(auth,em,pw);
+  const data={username:un,usernameLower:key,email:em,phone:ph,address:ad,created:Date.now()};
+  try{
+   const b=writeBatch(db);
+   b.set(doc(db,"usernames",key),{uid:cred.user.uid});
+   b.set(doc(db,"users",cred.user.uid),data);
+   await b.commit();
+  }catch(err){
+   try{await cred.user.delete()}catch(x){}
+   $("#esuUser").textContent="This username may already be taken. Please try a different one.";return reset();
+  }
+  try{await updateProfile(cred.user,{displayName:un})}catch(x){}
+  user=cred.user;profile=data;ready=true;reset();
+  if(next=="cart"){location="cart.html";return}
+  tab="orders";render();window.scrollTo(0,0);
+ }catch(err){
+  const m=msg(err);
+  if(err&&err.code=="auth/email-already-in-use")$("#esuEmail").textContent=m;else $("#esuGen").textContent=m;
+  reset();
+ }
 };
 $("#loginForm").onsubmit=async e=>{
- e.preventDefault();
- const key=$("#liUser").value.trim().toLowerCase(),pw=$("#liPass").value,u=users()[key];
- $("#eliUser").textContent=key?"":"Please enter your username.";$("#eliPass").textContent=pw?"":"Please enter your password.";
- if(!key||!pw)return;
- if(!u||await hashPw(pw,u.salt)!==u.hash){$("#eliPass").textContent="Incorrect username or password.";return}
- done(key);
+ e.preventDefault();$("#eliInfo").textContent="";
+ const em=$("#liEmail").value.trim(),pw=$("#liPass").value;
+ $("#eliEmail").textContent=em?"":"Please enter your email.";$("#eliPass").textContent=pw?"":"Please enter your password.";
+ if(!em||!pw)return;
+ const btn=$("#liBtn");btn.disabled=true;btn.textContent="Logging in…";
+ try{await signInWithEmailAndPassword(auth,em,pw)}catch(err){$("#eliPass").textContent=msg(err)}
+ btn.disabled=false;btn.textContent="Log in";
 };
+async function forgot(){
+ const em=$("#liEmail").value.trim();$("#eliInfo").textContent="";$("#eliPass").textContent="";
+ if(!/^\S+@\S+\.\S+$/.test(em)){$("#eliEmail").textContent="Enter your email above first, then tap Forgot password.";return}
+ $("#eliEmail").textContent="";
+ try{await sendPasswordResetEmail(auth,em);$("#eliInfo").textContent="If an account exists for this email, a password reset link has been sent. Check your inbox and spam folder."}
+ catch(err){$("#eliPass").textContent=msg(err)}
+}
 document.addEventListener("click",e=>{
- const t=e.target.closest("[data-mode],[data-tab],[data-logout]");if(!t)return;
+ const t=e.target.closest("[data-mode],[data-tab],[data-logout],[data-forgot]");if(!t)return;
  const d=t.dataset;
  if(d.mode!==undefined)setMode(d.mode);
  else if(d.tab!==undefined){tab=d.tab;render()}
- else if(d.logout!==undefined){try{localStorage.removeItem(SESSION)}catch(x){}render();setMode("login");window.scrollTo(0,0)}
+ else if(d.forgot!==undefined)forgot();
+ else if(d.logout!==undefined){signOut(auth).then(()=>{setMode("login");window.scrollTo(0,0)})}
 });
 document.addEventListener("change",e=>{const t=e.target;if(t.dataset&&t.dataset.show)$("#"+t.dataset.show).type=t.checked?"text":"password"});
 $("#sform").onsubmit=e=>{e.preventDefault();location="home.html?q="+encodeURIComponent($("#q").value.trim())};
+if(location.protocol=="file:")$("#fileWarn").hidden=false;
 cartCount();render();
 if(new URLSearchParams(location.search).get("mode")=="signup")setMode("signup");
 </script></body></html>
