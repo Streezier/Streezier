@@ -152,7 +152,7 @@ textarea:focus{border-color:var(--indigo);outline:0}
 </style></head><body>
 <header><div class="wrap"><a class="logo" href="index.html">Streez<b>ier</b></a>
 <form class="sform" id="sform" role="search"><input id="q" type="search" placeholder="Search for kitchen, home or car accessories" aria-label="Search products"><button type="submit">Search</button></form>
-<nav><a href="index.html">About</a><a href="home.html">Home</a><a href="profile.html">Profile</a><a href="cart.html" class="on">🛒<span class="badge" id="count" hidden>0</span></a></nav></div></header>
+<nav><a href="index.html">About</a><a href="home.html">Home</a><a href="profile.html" class="">Profile</a><a href="cart.html" class="on">🛒<span class="badge" id="count" hidden>0</span></a></nav></div></header>
 <div class="banner"><div class="wrap"><h2>Your cart</h2></div></div>
 <main class="wrap">
 <div class="cols" id="cartView">
@@ -182,7 +182,12 @@ textarea:focus{border-color:var(--indigo);outline:0}
 <div class="done" id="done" hidden></div>
 </main>
 <footer><div class="wrap">© Streezier · Free shipping over Rs. 1499 · 7-day returns · 1000+ orders every month · support.streezier@gmail.com</div></footer>
-<script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,updateProfile,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,collection,query,where,getDocs,writeBatch} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyCjp4e3qn_jrMizceBD62a4SuF0wUUeahM",authDomain:"streezier.firebaseapp.com",projectId:"streezier",storageBucket:"streezier.firebasestorage.app",messagingSenderId:"842549278881",appId:"1:842549278881:web:fddf40dd711fd38066d8e0",measurementId:"G-3FGNLJ1302"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
 /* ============ ORDER EMAILS (set this up once) ============
    Every new order is emailed to you through Web3Forms (free, no server needed):
    1) Go to https://web3forms.com, type YOUR email, and they send you an "Access Key".
@@ -200,13 +205,12 @@ const COUPONS={
  "WELCOME10":{type:"percent",value:10,min:0,label:"10% off your order"}
 };
 
-const SESSION="streezier_session",USERS="streezier_users";
 const $=s=>document.querySelector(s);
 const money=n=>"Rs. "+Number(n).toLocaleString("en-IN");
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
 const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-const account=()=>{const k=read(SESSION,null);return k?read(USERS,{})[k]||null:null};
+let user=null,profile=null,ready=false,pending=null;
 let cart=read(KEY,{}),coupon=null,cm={t:"",ok:false};
 
 function totals(){
@@ -218,7 +222,7 @@ function totals(){
 }
 function setQty(id,q){
  if(q<1)delete cart[id];else cart[id].qty=q;
- write(KEY,cart);
+ write(KEY,cart);if(pending&&!pending.saved)pending=null;
  if(coupon&&totals().sub<COUPONS[coupon].min){coupon=null;cm={t:"Coupon removed: the minimum order amount is no longer met.",ok:false}}
  render();
 }
@@ -228,7 +232,7 @@ function render(){
  $("#items").innerHTML=has?ids.map(id=>{const p=cart[id],em=p.emoji||"🛍️";return `<div class="row"><div class="thumb" style="background:${p.bg||"#e9e7ff"}">${p.image?`<img src="${esc(p.image)}" alt="" onerror="this.replaceWith('${em}')">`:em}</div><div class="info"><strong>${esc(p.name)}</strong><br><span>${money(p.price)} each</span></div><div class="qty"><button aria-label="Decrease quantity" data-dec="${id}">−</button>${p.qty}<button aria-label="Increase quantity" data-inc="${id}">+</button></div><strong>${money(p.price*p.qty)}</strong><button class="link" data-rm="${id}">Remove</button></div>`}).join(""):`<div class="empty">🛒<br>Your cart is empty.<br><br><a class="btn" href="home.html">Start shopping</a></div>`;
  $("#summary").hidden=!has;
  if(!has)$("#checkout").hidden=true;
- const ac=account();$("#loginNote").innerHTML=ac?`Ordering as <strong>@${esc(ac.username)}</strong>`:`You need to <a href="profile.html?next=cart" style="color:var(--indigo);font-weight:700">log in or sign up</a> to place your order.`;
+ const ac=profile;$("#loginNote").innerHTML=!ready?"":ac?`Ordering as <strong>@${esc(ac.username)}</strong>`:`You need to <a href="profile.html?next=cart" style="color:var(--indigo);font-weight:700">log in or sign up</a> to place your order.`;
  $("#sub").textContent=money(t.sub);
  $("#discRow").hidden=!t.disc;$("#disc").textContent="− "+money(t.disc);
  $("#fee").innerHTML=t.fee?money(t.fee):`<s>${money(FEE)}</s><span class="free">FREE</span>`;
@@ -264,24 +268,30 @@ async function sendOrder(o){
 }
 async function placeOrder(e){
  e.preventDefault();
- const acct=account();if(!acct){location="profile.html?next=cart";return}
+ if(!user||!profile){location="profile.html?next=cart";return}
  const name=$("#cname").value.trim(),addr=$("#caddr").value.trim(),phone=cleanPhone($("#cphone").value);
  const en=name.length<2?"Please enter your full name.":"";
  const ea=addr.length<15?"Please enter your complete address.":!/\b\d{6}\b/.test(addr)?"Please include your 6-digit PIN code.":"";
  const ep=/^[6-9]\d{9}$/.test(phone)?"":"Please enter a valid 10-digit mobile number.";
  $("#ename").textContent=en;$("#eaddr").textContent=ea;$("#ephone").textContent=ep;
  if(en||ea||ep)return;
- const t=totals(),order={
-  id:"STZ"+Date.now().toString().slice(-7),date:new Date().toLocaleString("en-IN"),
-  user:acct.key,username:acct.username,email:acct.email,name,address:addr,phone,coupon,items:Object.values(cart),...t};
  const btn=$("#placeBtn");btn.disabled=true;btn.textContent="Placing order…";$("#sendErr").textContent="";
- const r=await sendOrder(order);
+ const fail=m=>{$("#sendErr").textContent=m;btn.disabled=false;btn.textContent="Place order"};
+ if(!pending){
+  const t=totals();
+  pending={saved:false,order:{id:"STZ"+Date.now().toString().slice(-7),date:new Date().toLocaleString("en-IN"),ts:Date.now(),uid:user.uid,username:profile.username,email:profile.email||user.email,name,address:addr,phone,coupon:coupon||null,items:Object.values(cart),...t}};
+ }
+ if(!pending.saved){
+  try{await setDoc(doc(db,"orders",pending.order.id),pending.order);pending.saved=true}
+  catch(err){return fail("Sorry, we couldn't save your order. Please check your internet and try again.")}
+ }
+ const r=await sendOrder(pending.order);
+ if(r=="fail")return fail("Your order is saved, but we couldn't notify our team yet. Please tap Place order again.");
+ const order=pending.order;
+ pending=null;cart={};coupon=null;cm={t:"",ok:false};write(KEY,cart);render();
  btn.disabled=false;btn.textContent="Place order";
- if(r=="fail"){$("#sendErr").textContent="Sorry, we couldn't send your order. Please check your internet and try again, or email support.streezier@gmail.com.";return}
- write(ORDERS,[order,...read(ORDERS,[])]);
- cart={};coupon=null;cm={t:"",ok:false};write(KEY,cart);render();
  $("#cartView").hidden=true;$("#done").hidden=false;
- $("#done").innerHTML=(r=="off"?`<div class="notice">⚠ Email is not set up yet, so this order was NOT sent to you. Add your Web3Forms key in cart.html (see ORDER EMAILS).</div>`:"")+`<div class="big">✅</div><h2>Order placed!</h2><p>Thank you, ${esc(name)}. Your order ID is <strong>${order.id}</strong>.</p><div class="panel box"><div class="sum"><span>Items</span><span>${order.items.reduce((a,p)=>a+p.qty,0)}</span></div><div class="sum"><span>Delivery fee</span><span>${t.fee?money(t.fee):"FREE"}</span></div><div class="sum total"><span>Total</span><span>${money(t.total)}</span></div><p style="margin:12px 0 0"><strong>Deliver to:</strong><br>${esc(name)}<br>${esc(addr)}<br>Phone: ${esc(phone)}</p></div><p class="paynote">Questions? Write to support.streezier@gmail.com with your order ID.</p><br><a class="btn" href="home.html">Continue shopping</a>`;
+ $("#done").innerHTML=(r=="off"?`<div class="notice">⚠ Email is not set up yet, so this order was NOT sent to you. Add your Web3Forms key in cart.html (see ORDER EMAILS).</div>`:"")+`<div class="big">✅</div><h2>Order placed!</h2><p>Thank you, ${esc(order.name)}. Your order ID is <strong>${order.id}</strong>.</p><div class="panel box"><div class="sum"><span>Items</span><span>${order.items.reduce((a,p)=>a+p.qty,0)}</span></div><div class="sum"><span>Delivery fee</span><span>${order.fee?money(order.fee):"FREE"}</span></div><div class="sum total"><span>Total</span><span>${money(order.total)}</span></div><p style="margin:12px 0 0"><strong>Deliver to:</strong><br>${esc(order.name)}<br>${esc(order.address)}<br>Phone: ${esc(order.phone)}</p></div><p class="paynote">Questions? Write to support.streezier@gmail.com with your order ID.</p><br><a class="btn" href="home.html">Continue shopping</a>`;
  window.scrollTo(0,0);
 }
 document.addEventListener("click",e=>{
@@ -294,10 +304,18 @@ document.addEventListener("click",e=>{
 });
 $("#applyBtn").onclick=applyCoupon;
 $("#coupon").onkeydown=e=>{if(e.key=="Enter"){e.preventDefault();applyCoupon()}};
-$("#buyBtn").onclick=()=>{const a=account();if(!a){location="profile.html?next=cart";return}
+$("#buyBtn").onclick=()=>{if(!ready)return;const a=profile;if(!a){location="profile.html?next=cart";return}
  if(!$("#cphone").value)$("#cphone").value=a.phone||"";if(!$("#caddr").value)$("#caddr").value=a.address||"";
  $("#checkout").hidden=false;$("#checkout").scrollIntoView({behavior:"smooth"});$("#cname").focus()};
 $("#checkout").onsubmit=placeOrder;
 $("#sform").onsubmit=e=>{e.preventDefault();location="home.html?q="+encodeURIComponent($("#q").value.trim())};
 render();
+onAuthStateChanged(auth,async u=>{
+ user=u;profile=null;
+ if(u){
+  try{const s=await getDoc(doc(db,"users",u.uid));profile=s.exists()?s.data():null}catch(e){}
+  if(!profile)profile={username:u.displayName||(u.email||"user").split("@")[0],email:u.email,phone:"",address:""};
+ }
+ ready=true;render();
+});
 </script></body></html>
