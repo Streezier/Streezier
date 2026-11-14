@@ -1,0 +1,129 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Streezier · Smart accessories for home, kitchen &amp; car</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#17153b;--indigo:#4f46e5;--violet:#7c3aed;--coral:#ff5a5f;--sun:#ffc933;--mint:#12b886;--sky:#2b8cff;--bg:#f4f3ff;--ink:#1c1a3a;--muted:#6b6a8a}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.55 Outfit,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+h1,h2,h3{margin:0;line-height:1.1;font-weight:800}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+header{background:var(--navy);position:sticky;top:0;z-index:5;box-shadow:0 4px 20px #17153b33}
+header .wrap{display:flex;align-items:center;gap:12px;height:68px}
+.logo{font-size:1.6rem;font-weight:800;color:#fff;margin-right:auto}
+.logo b{color:var(--sun)}
+nav{display:flex;gap:6px}
+nav a{color:#cfcdf5;font-weight:600;padding:8px 16px;border-radius:99px}
+nav a:hover{background:#ffffff1a;color:#fff}
+nav a.on{background:var(--indigo);color:#fff}
+.badge{background:var(--coral);color:#fff;border-radius:99px;font-size:.75rem;padding:2px 8px;margin-left:6px}
+.hero{background:linear-gradient(135deg,var(--navy),var(--indigo) 60%,var(--violet));color:#fff;padding:64px 0 90px}
+.hero h1{font-size:clamp(2.4rem,6vw,4.2rem);max-width:14ch}
+.hero p{max-width:46ch;color:#dcd9ff;font-size:1.15rem;margin:16px 0 26px}
+.btn{display:inline-block;background:var(--coral);color:#fff;border:0;border-radius:12px;padding:12px 24px;font:700 1rem Outfit,sans-serif;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px #ff5a5f55}
+.btn.sun{background:var(--sun);color:var(--navy)}
+.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:-50px;position:relative}
+.cat-card{border:0;border-radius:16px;padding:22px;color:#fff;text-align:left;cursor:pointer;font:inherit;box-shadow:0 10px 24px #17153b33}
+.cat-card span{font-size:2.4rem;display:block}.cat-card h3{font-size:1.4rem;margin-top:6px}.cat-card small{opacity:.9}
+.c-Home{background:linear-gradient(135deg,#ff8a3d,#ff5a5f)}.c-Kitchen{background:linear-gradient(135deg,#12b886,#0ca678 40%,#2b8cff)}.c-Vehicle{background:linear-gradient(135deg,#2b8cff,#7c3aed)}
+.strip{display:flex;justify-content:space-around;gap:16px;flex-wrap:wrap;background:#fff;border-radius:14px;padding:16px;margin:28px 0;font-weight:600;box-shadow:0 4px 14px #4f46e51a}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 20px;align-items:center}
+.filters h2{margin-right:auto;font-size:1.9rem}
+.chip{border:2px solid #d9d6ff;background:#fff;color:var(--ink);border-radius:99px;padding:6px 18px;cursor:pointer;font:600 1rem Outfit,sans-serif}
+.chip.on{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:22px;padding-bottom:60px}
+.card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 16px #4f46e51a;display:flex;flex-direction:column;position:relative;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 30px #4f46e533}
+.thumb{height:170px;display:grid;place-items:center;font-size:4.2rem}
+.sale{position:absolute;top:12px;left:12px;background:var(--coral);color:#fff;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:99px}
+.body{padding:16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.tag{align-self:flex-start;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:99px}
+.t-Home{background:#ffe8d6;color:#d9480f}.t-Kitchen{background:#d3f9e8;color:#087f5b}.t-Vehicle{background:#dbe9ff;color:#1c5fd4}
+.body h3{font-size:1.15rem}
+.price{font-size:1.25rem;font-weight:800;color:var(--indigo);margin-top:auto}.price s{color:var(--muted);font-weight:400;font-size:.95rem;margin-left:6px}
+.card .btn{width:100%;margin-top:8px;background:var(--indigo)}
+.card .btn:hover{box-shadow:0 8px 18px #4f46e555}
+.banner{background:linear-gradient(135deg,var(--navy),var(--indigo));color:#fff;padding:40px 0}
+.banner h2{font-size:2.4rem}
+.cols{display:grid;grid-template-columns:1.7fr 1fr;gap:26px;padding:32px 0 60px}
+.panel{background:#fff;border-radius:18px;padding:22px;box-shadow:0 4px 16px #4f46e51a}
+.panel h3{margin-bottom:10px}
+.row{display:flex;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid #ecebff;flex-wrap:wrap}
+.row:last-child{border:0}.row .thumb{height:68px;width:68px;font-size:2rem;border-radius:14px;flex:none}
+.info{flex:1;min-width:140px}.info span{color:var(--muted);font-size:.9rem}
+.qty{display:flex;align-items:center;gap:10px;font-weight:700}
+.qty button{width:32px;height:32px;border-radius:10px;border:0;background:#e9e7ff;color:var(--indigo);font-size:1.1rem;font-weight:700;cursor:pointer}
+.qty button:hover{background:var(--indigo);color:#fff}
+.link{background:none;border:0;color:var(--coral);cursor:pointer;font:600 .95rem Outfit,sans-serif}
+.sum{display:flex;justify-content:space-between;padding:6px 0}
+.sum.total{font-weight:800;font-size:1.35rem;border-top:2px dashed #d9d6ff;margin-top:10px;padding-top:14px}
+.free{color:var(--mint);font-weight:700}
+.empty{text-align:center;padding:36px 0;color:var(--muted)}
+label{display:block;font-weight:600;margin:14px 0 4px}
+input{width:100%;padding:11px 14px;border:2px solid #e1dfff;border-radius:12px;background:#faf9ff;font:inherit;color:var(--ink)}
+input:focus{border-color:var(--indigo);outline:0}
+.msg{color:var(--mint);font-weight:700;margin-left:14px}
+.avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--sun),var(--coral));display:grid;place-items:center;font-size:2rem;margin-bottom:8px}
+footer{background:var(--navy);color:#b9b7e6;padding:28px 0;font-size:.95rem;text-align:center}
+@media(max-width:760px){.cols{grid-template-columns:1fr}.cats{grid-template-columns:1fr}.hero{padding-bottom:70px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+header .wrap{height:auto;min-height:68px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
+.logo{margin-right:0}
+.sform{flex:1;display:flex;min-width:220px;max-width:620px;margin:0 auto}
+.sform input{border:0;border-radius:12px 0 0 12px;background:#fff;padding:12px 16px}
+.sform button{border:0;background:var(--sun);color:var(--navy);font:700 1rem Outfit,sans-serif;padding:0 22px;border-radius:0 12px 12px 0;cursor:pointer}
+.sform button:hover{background:#ffd75e}
+@media(max-width:760px){.sform{order:3;flex-basis:100%;max-width:none}nav{margin-left:auto}}
+.catbar{display:flex;gap:14px;overflow-x:auto;padding:18px 0;scrollbar-width:none}
+.catbar button{flex:none;border:0;background:none;cursor:pointer;font:600 .95rem Outfit,sans-serif;color:var(--ink);text-align:center}
+.catbar i{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;font-size:1.8rem;font-style:normal;margin:0 auto 4px;border:3px solid transparent}
+.catbar .on i{border-color:var(--indigo)}
+.deal{background:linear-gradient(120deg,var(--coral),#ff9a3d 60%,var(--sun));color:#fff;border-radius:18px;padding:30px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.deal h2{font-size:clamp(1.6rem,4vw,2.4rem)}.deal p{margin:6px 0 0;font-weight:600}
+.deal .btn{background:var(--navy)}
+.shop{display:grid;grid-template-columns:220px 1fr;gap:24px;padding:24px 0 60px}
+.side{background:#fff;border-radius:16px;padding:18px;align-self:start;box-shadow:0 4px 16px #4f46e51a}
+.side h3{font-size:1.05rem;margin:0 0 8px}.side h3:not(:first-child){margin-top:18px}
+.side label{display:flex;gap:8px;align-items:center;font-weight:500;margin:6px 0;cursor:pointer}
+.side input{width:auto}
+select{width:100%;padding:10px;border:2px solid #e1dfff;border-radius:10px;font:inherit;background:#faf9ff}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.stars{color:#f5a300;font-size:.95rem}.stars span{color:var(--muted);margin-left:4px}
+.off{color:var(--coral);font-weight:700;font-size:.9rem;margin-left:6px}
+.del{font-size:.85rem;color:var(--mint);font-weight:600}
+.two{display:flex;gap:8px;margin-top:8px}.two .btn{margin:0;padding:10px 6px;font-size:.92rem}
+.card .two .btn:first-child{background:var(--sun);color:var(--navy)}
+.card .two .btn:last-child{background:var(--coral)}
+.about{max-width:62ch}.about h2{font-size:2rem;margin:48px 0 12px}.about p{color:var(--muted);font-size:1.05rem}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:18px 0}
+.steps .panel span{font-size:2rem}.steps h3{margin:6px 0}.steps p{margin:0;color:var(--muted)}
+.why{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0 60px}
+@media(max-width:760px){.shop{grid-template-columns:1fr}.steps,.why{grid-template-columns:1fr}}
+.statband{background:linear-gradient(135deg,var(--navy),var(--indigo));color:#fff;border-radius:18px;padding:28px;display:flex;justify-content:space-around;gap:20px;flex-wrap:wrap;text-align:center;margin:10px 0 0}
+.statband b{display:block;font-size:2.4rem;color:var(--sun);font-weight:800}
+.cta{text-align:center;padding:40px 0 64px}.cta h2{font-size:2rem;margin-bottom:16px}
+.about p+p{margin-top:14px}
+</style></head><body>
+<header><div class="wrap"><a class="logo" href="index.html">Streez<b>ier</b></a>
+<form class="sform" id="sform" role="search"><input id="q" type="search" placeholder="Search for kitchen, home or car accessories" aria-label="Search products"><button type="submit">Search</button></form>
+<nav><a href="index.html" class="on">About</a><a href="home.html">Home</a><a href="profile.html">Profile</a><a href="cart.html">🛒<span class="badge" id="count" hidden>0</span></a></nav></div></header>
+<section class="hero"><div class="wrap"><h1>Everyday essentials, made easier.</h1><p>Streezier is an online store for smart home, kitchen and vehicle accessories, chosen for usefulness and delivered to your door.</p><a class="btn sun" href="home.html">Start shopping</a></div></section>
+<main class="wrap"><div class="cats"><a class="cat-card c-Home" href="home.html?c=Home"><span>🏠</span><h3>Home</h3><small>Organize &amp; brighten</small></a><a class="cat-card c-Kitchen" href="home.html?c=Kitchen"><span>🍳</span><h3>Kitchen</h3><small>Cook smarter</small></a><a class="cat-card c-Vehicle" href="home.html?c=Vehicle"><span>🚗</span><h3>Vehicle</h3><small>Tidy every drive</small></a></div>
+<div class="about"><h2>Who are we</h2>
+<p>Streezier began with a simple observation: most of the small problems in daily life already have a simple solution, but those solutions are buried under thousands of look-alike listings, inflated prices and reviews you cannot trust. We wanted to build a store where an ordinary person could find a genuinely useful product in a few minutes, pay a fair price and receive it without any stress.</p>
+<p>We focus on three parts of everyday life: the home, the kitchen and the vehicle. In the home, that means organizers, lights and small gadgets that reduce clutter and make rooms easier to live in. In the kitchen, it means tools that save time and effort while cooking, storing and cleaning up. For your vehicle, it means accessories that keep your car tidy, your phone in sight and your drives more comfortable.</p>
+<p>Every product on Streezier is picked with the same questions in mind: Does it solve a real problem? Is the quality good enough to last? Is the price fair for what you get? If the answer to any of these is no, it does not make it to our store. We would rather offer a smaller range that we are proud of than a huge catalogue that nobody can sort through.</p>
+<p>We also believe that buying online should feel safe and clear. That is why we show prices openly, explain our shipping and return rules in plain words, confirm every online payment with proof, and keep a real support team ready to help when you need it. Today, we deliver over 1000 orders every month, and every one of those customers is a reason for us to keep improving.</p>
+<p>Whether you are setting up a new home, upgrading your kitchen or simply tired of a messy car, Streezier is here to make everyday life a little easier.</p>
+<h2>How ordering works</h2></div>
+<div class="steps"><div class="panel"><span>🛍️</span><h3>You order</h3><p>Pick products and check out securely.</p></div><div class="panel"><span>📦</span><h3>We ship</h3><p>Your order is packed and dispatched by our trusted suppliers.</p></div><div class="panel"><span>🚚</span><h3>You receive</h3><p>Track your parcel until it arrives. Delivery times are shown at checkout.</p></div></div>
+<div class="about"><h2>Our shopping promise</h2></div>
+<div class="why"><div class="panel"><h3>🚚 Free shipping over Rs. 1499</h3><p>Shipping costs on smaller orders depend on your area and are shown at checkout before you pay.</p></div><div class="panel"><h3>↩️ 7-day returns</h3><p>Customers who buy items get a 7-day return window if they are not satisfied.</p></div><div class="panel"><h3>🔒 Secure online payments</h3><p>All payments are made online, and every payment comes with proof of your order.</p></div><div class="panel"><h3>💬 Support</h3><p>Write to us at support.streezier@gmail.com and our team will reply.</p></div></div>
+<div class="statband"><div><b>1000+</b>orders delivered every month</div><div><b>Rs. 1499</b>free shipping above this</div><div><b>7 days</b>easy returns</div></div>
+<div class="cta"><h2>Ready to find something useful?</h2><a class="btn" href="home.html">Start shopping</a></div></main>
+<footer><div class="wrap">© Streezier · Free shipping over Rs. 1499 · 7-day returns · 1000+ orders every month · support.streezier@gmail.com</div></footer>
+<script>
+try{const c=JSON.parse(localStorage.getItem("cart")||"{}"),n=Object.values(c).reduce((a,b)=>a+b,0),b=document.getElementById("count");if(n){b.textContent=n;b.hidden=false}}catch(e){}
+document.getElementById("sform").onsubmit=e=>{e.preventDefault();location="home.html?q="+encodeURIComponent(document.getElementById("q").value.trim())};
+</script></body></html>
