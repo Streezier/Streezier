@@ -207,6 +207,19 @@ const COUPONS={
  "WELCOME10":{type:"percent",value:10,min:0,label:"10% off your order"}
 };
 
+/* If a photo is not found, try other common file names (.jpeg, .png, .webp, capital letters,
+   a doubled .jpg.jpg, or the main folder) before showing the emoji instead. */
+const EXTS=["jpg","jpeg","png","webp","JPG","JPEG","PNG"];
+function photoVariants(src){
+ const m=src.match(/^(.*\/)?([^\/]+?)(\.[A-Za-z0-9]+)?$/),dir=m[1]||"",base=m[2],out=[];
+ [dir,""].forEach(d=>EXTS.forEach(e=>{const v=d+base+"."+e;if(v!==src&&!out.includes(v))out.push(v)}));
+ out.push(src+".jpg",src+".png");
+ return out;
+}
+window.imgFail=function(img,emoji){
+ const orig=img.dataset.orig||(img.dataset.orig=img.getAttribute("src")),i=+(img.dataset.i||0),v=photoVariants(orig);
+ if(i<v.length){img.dataset.i=i+1;img.src=v[i]}else img.replaceWith(emoji);
+};
 const $=s=>document.querySelector(s);
 const money=n=>"Rs. "+Number(n).toLocaleString("en-IN");
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -231,7 +244,7 @@ function setQty(id,q){
 function render(){
  const ids=Object.keys(cart),t=totals(),has=ids.length>0;
  const n=ids.reduce((a,id)=>a+cart[id].qty,0),b=$("#count");b.textContent=n;b.hidden=!n;
- $("#items").innerHTML=has?ids.map(id=>{const p=cart[id],em=p.emoji||"🛍️";return `<div class="row"><div class="thumb" style="background:${p.bg||"#e9e7ff"}">${p.image?`<img src="${esc(p.image)}" alt="" onerror="this.replaceWith('${em}')">`:em}</div><div class="info"><strong>${esc(p.name)}</strong><br><span>${money(p.price)} each</span></div><div class="qty"><button aria-label="Decrease quantity" data-dec="${id}">−</button>${p.qty}<button aria-label="Increase quantity" data-inc="${id}">+</button></div><strong>${money(p.price*p.qty)}</strong><button class="link" data-rm="${id}">Remove</button></div>`}).join(""):`<div class="empty">🛒<br>Your cart is empty.<br><br><a class="btn" href="home.html">Start shopping</a></div>`;
+ $("#items").innerHTML=has?ids.map(id=>{const p=cart[id],em=p.emoji||"🛍️";return `<div class="row"><div class="thumb" style="background:${p.bg||"#e9e7ff"}">${p.image?`<img src="${esc(p.image)}" alt="" onerror="imgFail(this,'${em}')">`:em}</div><div class="info"><strong>${esc(p.name)}</strong><br><span>${money(p.price)} each</span></div><div class="qty"><button aria-label="Decrease quantity" data-dec="${id}">−</button>${p.qty}<button aria-label="Increase quantity" data-inc="${id}">+</button></div><strong>${money(p.price*p.qty)}</strong><button class="link" data-rm="${id}">Remove</button></div>`}).join(""):`<div class="empty">🛒<br>Your cart is empty.<br><br><a class="btn" href="home.html">Start shopping</a></div>`;
  $("#summary").hidden=!has;
  if(!has)$("#checkout").hidden=true;
  const ac=profile;$("#loginNote").innerHTML=!ready?"":ac?`Ordering as <strong>@${esc(ac.username)}</strong>`:`You need to <a href="profile.html?next=cart" style="color:var(--indigo);font-weight:700">log in or sign up</a> to place your order.`;
