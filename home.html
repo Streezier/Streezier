@@ -201,10 +201,23 @@ const PRODUCTS=[
 ];
 /* ====================== END OF PRODUCTS ====================== */
 
+/* If a photo is not found, try other common file names (.jpeg, .png, .webp, capital letters,
+   a doubled .jpg.jpg, or the main folder) before showing the emoji instead. */
+const EXTS=["jpg","jpeg","png","webp","JPG","JPEG","PNG"];
+function photoVariants(src){
+ const m=src.match(/^(.*\/)?([^\/]+?)(\.[A-Za-z0-9]+)?$/),dir=m[1]||"",base=m[2],out=[];
+ [dir,""].forEach(d=>EXTS.forEach(e=>{const v=d+base+"."+e;if(v!==src&&!out.includes(v))out.push(v)}));
+ out.push(src+".jpg",src+".png");
+ return out;
+}
+window.imgFail=function(img,emoji){
+ const orig=img.dataset.orig||(img.dataset.orig=img.getAttribute("src")),i=+(img.dataset.i||0),v=photoVariants(orig);
+ if(i<v.length){img.dataset.i=i+1;img.src=v[i]}else img.replaceWith(emoji);
+};
 const $=s=>document.querySelector(s);
 const money=n=>"Rs. "+Number(n).toLocaleString("en-IN");
 const imgs=p=>p.images||(p.image?[p.image]:[]);
-const pic=(u,p)=>`<img src="${u}" alt="${p.name}" onerror="this.replaceWith('${p.emoji}')">`;
+const pic=(u,p)=>`<img src="${u}" alt="${p.name}" onerror="imgFail(this,'${p.emoji}')">`;
 const media=p=>imgs(p)[0]?pic(imgs(p)[0],p):p.emoji;
 const S={q:"",c:"All",sort:""};let CUR=null;
 const KEY="streezier_cart";
@@ -228,7 +241,7 @@ function renderList(){
  document.querySelectorAll("[data-s]").forEach(b=>b.classList.toggle("on",b.dataset.s==S.sort));
 }
 function showDetail(p){
- $("#detailView").innerHTML=`<button class="back" data-back>← Back to products</button><div class="detail"><div><div class="dimg" id="mainImg" style="background:${p.bg}">${media(p)}</div>${imgs(p).length>1?`<div class="thumbs">${imgs(p).map((u,i)=>`<img src="${u}" alt="Photo ${i+1}" data-pic="${u}" onerror="this.style.display='none'">`).join("")}</div>`:""}</div><div><span class="tag t-${p.category}">${p.category}</span><h1>${p.name}</h1><div class="dprice">${money(p.price)}${p.mrp?`<span class="mrp">${money(p.mrp)}</span><span class="off">${Math.round(100-p.price/p.mrp*100)}% off</span>`:""}</div><div class="del">Free shipping over Rs. 1499. Shipping cost depends on your area.</div><p>${p.description}</p><ul>${(p.highlights||[]).map(h=>`<li>${h}</li>`).join("")}</ul><div class="two"><button class="btn" data-add="${p.id}">Add to cart</button><button class="btn" data-buy="${p.id}">Buy now</button></div></div></div>`;
+ $("#detailView").innerHTML=`<button class="back" data-back>← Back to products</button><div class="detail"><div><div class="dimg" id="mainImg" style="background:${p.bg}">${media(p)}</div>${imgs(p).length>1?`<div class="thumbs">${imgs(p).map((u,i)=>`<img src="${u}" alt="Photo ${i+1}" data-pic="${u}" onerror="imgFail(this,'')">`).join("")}</div>`:""}</div><div><span class="tag t-${p.category}">${p.category}</span><h1>${p.name}</h1><div class="dprice">${money(p.price)}${p.mrp?`<span class="mrp">${money(p.mrp)}</span><span class="off">${Math.round(100-p.price/p.mrp*100)}% off</span>`:""}</div><div class="del">Free shipping over Rs. 1499. Shipping cost depends on your area.</div><p>${p.description}</p><ul>${(p.highlights||[]).map(h=>`<li>${h}</li>`).join("")}</ul><div class="two"><button class="btn" data-add="${p.id}">Add to cart</button><button class="btn" data-buy="${p.id}">Buy now</button></div></div></div>`;
 }
 function route(){
  const p=CUR!==null&&PRODUCTS.find(x=>String(x.id)===String(CUR));
