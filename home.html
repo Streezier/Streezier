@@ -121,6 +121,7 @@ a.card{color:inherit}
 @media(max-width:760px){.detail{grid-template-columns:1fr}}
 button.back{background:none;border:0;cursor:pointer;font:700 1rem Outfit,sans-serif;padding:0}
 .card[data-open]{cursor:pointer}
+footer a{color:#fff;text-decoration:underline}
 </style></head><body>
 <header><div class="wrap"><a class="logo" href="index.html">Streez<b>ier</b></a>
 <form class="sform" id="sform" role="search"><input id="q" type="search" placeholder="Search for kitchen, home or car accessories" aria-label="Search products"><button type="submit">Search</button></form>
@@ -133,7 +134,7 @@ button.back{background:none;border:0;cursor:pointer;font:700 1rem Outfit,sans-se
 </div>
 <div id="detailView" hidden></div>
 </main>
-<footer><div class="wrap">© Streezier · Free shipping over Rs. 1499 · 7-day returns · 1000+ orders every month · support.streezier@gmail.com</div></footer>
+<footer><div class="wrap">© Streezier · Free shipping over Rs. 1499 · 7-day returns · 1000+ orders every month · support.streezier@gmail.com<br><a href="privacy.html">Privacy Policy</a> · <a href="returns.html">Returns &amp; Refunds</a></div></footer>
 <script>
 /* ============ HOW TO ADD ANOTHER PRODUCT ============
    Copy the whole product block below (from { to },) and paste it right after it.
@@ -152,6 +153,50 @@ const PRODUCTS=[
  bg:"linear-gradient(135deg,#1e1b4b,#4f46e5)",
  description:"Turn any room into a magical night sky. This Galaxy Projector Night Light fills your walls and ceiling with a soft glow of stars and colorful nebula lights, and its 360° rotation keeps the scene gently moving. It makes a calming bedtime companion for kids' bedrooms, a relaxing mood light for your own space, and a thoughtful gift for Valentine's Day, birthdays and weddings. It also works beautifully as a decoration for parties and special occasions.",
  highlights:["360° rotating starry sky and galaxy projection","Creates a calm, dreamy planetarium feel at home","Perfect for kids' bedrooms and bedtime","Great gift for Valentine's Day, weddings and birthdays","Doubles as stylish room and event decoration"]
+},
+{
+ id:2,
+ name:"Electric Fruit Peeler Machine, USB Rechargeable Automatic Peeler for Garlic, Grapes, Cherry Tomatoes, Plums & Small Fruits, T4",
+ category:"Kitchen",
+ price:699,
+ images:["images/fruit_peeler_1.jpg","images/fruit_peeler_2.jpg","images/fruit_peeler_3.jpg"],
+ emoji:"🍇",
+ bg:"linear-gradient(135deg,#e5dbff,#c4b0ff)",
+ description:"Peel small fruits and vegetables without the slow, sticky work. This USB rechargeable electric peeler is made for garlic, grapes, cherry tomatoes, plums and other small fruits, so you can get your ingredients ready faster. Being cordless and rechargeable, it is easy to use anywhere in the kitchen and simple to store when you are done.",
+ highlights:["Automatic electric peeling, so no more peeling by hand","USB rechargeable and cordless","Made for garlic, grapes, cherry tomatoes, plums and small fruits","Saves time when cooking and meal prep","Compact and easy to store"]
+},
+{
+ id:3,
+ name:"ABS Plastic Solid Hand Pressure Vegetable Chopper",
+ category:"Kitchen",
+ price:299,
+ images:["images/vegetablechopper_1.jpg","images/vegetablechopper_2.jpg","images/vegetablechopper_3.jpg"],
+ emoji:"🥕",
+ bg:"linear-gradient(135deg,#d3f9e8,#96f2d0)",
+ description:"Chop vegetables quickly with a simple press of your hand. This hand pressure vegetable chopper needs no electricity, which makes it easy to use every day for onions, tomatoes and other vegetables. The solid ABS plastic body is built for regular kitchen use, and the design keeps chopping neat and simple.",
+ highlights:["Hand pressure operation, no electricity or batteries needed","Solid ABS plastic body","Chops vegetables quickly and saves cooking time","Easy to use and easy to store","Affordable everyday kitchen helper"]
+},
+{
+ id:4,
+ name:"Plastic Tire Pen Holder (Black)",
+ category:"Home",
+ price:379,
+ images:["images/penholder_1.jpg","images/penholder_2.jpg","images/penholder_3.jpg"],
+ emoji:"🖊️",
+ bg:"linear-gradient(135deg,#e9ecef,#adb5bd)",
+ description:"Keep your desk neat with this fun tire-shaped pen holder. Made of plastic in a classic black finish, it holds your pens, pencils and small stationery in one place and adds a sporty, car-inspired look to your study table, office desk or workspace. It also makes a great small gift for anyone who loves cars.",
+ highlights:["Stylish tire design in black","Holds pens, pencils and small stationery","Keeps your desk tidy and organized","Great for home, office, study table or kids' room","A fun gift for car lovers"]
+},
+{
+ id:5,
+ name:"Cotton 3 Pcs Set Roti Box Storage Basket With Lid (Beige-White)",
+ category:"Kitchen",
+ price:399,
+ images:["images/storagebasket_1.jpg","images/storagebasket_2.jpg"],
+ emoji:"🧺",
+ bg:"linear-gradient(135deg,#fff3e0,#f1dcc0)",
+ description:"Store rotis and other kitchen items neatly with this set of 3 cotton baskets with lids. The soft beige-white cotton design looks lovely on your kitchen counter or dining table, and the lids keep what is inside covered. Use them for rotis and chapatis, snacks, fruits or small household items, and enjoy a tidier, more stylish kitchen.",
+ highlights:["Set of 3 cotton baskets with lids","Beige-white color that suits any kitchen","Great for storing rotis, chapatis and snacks","Can also hold fruits and small household items","Looks good on the counter or dining table"]
 }
 ];
 /* ====================== END OF PRODUCTS ====================== */
