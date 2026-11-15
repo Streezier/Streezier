@@ -149,6 +149,7 @@ textarea:focus{border-color:var(--indigo);outline:0}
 #accView{margin:28px 0 60px}
 .det div{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid #ecebff;flex-wrap:wrap}
 .det div:last-child{border:0}.det span{color:var(--muted)}.det b{text-align:right;word-break:break-word}
+footer a{color:#fff;text-decoration:underline}
 </style></head><body>
 <header><div class="wrap"><a class="logo" href="index.html">Streez<b>ier</b></a>
 <form class="sform" id="sform" role="search"><input id="q" type="search" placeholder="Search for kitchen, home or car accessories" aria-label="Search products"><button type="submit">Search</button></form>
@@ -181,7 +182,7 @@ textarea:focus{border-color:var(--indigo);outline:0}
 </div>
 <div class="done" id="done" hidden></div>
 </main>
-<footer><div class="wrap">© Streezier · Free shipping over Rs. 1499 · 7-day returns · 1000+ orders every month · support.streezier@gmail.com</div></footer>
+<footer><div class="wrap">© Streezier · Free shipping over Rs. 1499 · 7-day returns · 1000+ orders every month · support.streezier@gmail.com<br><a href="privacy.html">Privacy Policy</a> · <a href="returns.html">Returns &amp; Refunds</a></div></footer>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,updateProfile,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -199,6 +200,7 @@ const KEY="streezier_cart",ORDERS="streezier_orders",FREE_ABOVE=1499,FEE=100;
    Format:  "CODE":{type:"percent",value:10,min:0,label:"10% off"}
      type  "percent" (value = % off) or "flat" (value = Rs. off)
      min   minimum cart subtotal needed to use the code (0 = none)
+   Every coupon can be used only ONCE per customer account (enforced by the database).
    Delete the example below if you don't want any coupon to work yet.
 ====================================================== */
 const COUPONS={
@@ -242,12 +244,20 @@ function render(){
  const m=$("#cmsg");m.className="cmsg "+(cm.t?(cm.ok?"ok":"bad"):"");
  m.innerHTML=esc(cm.t)+(coupon?` <button class="link" type="button" data-rmc>Remove</button>`:"");
 }
-function applyCoupon(){
+async function applyCoupon(){
  const code=$("#coupon").value.trim().toUpperCase(),c=COUPONS[code];
  if(!code)cm={t:"Please enter a coupon code.",ok:false};
  else if(!c)cm={t:"This coupon code is not valid.",ok:false};
  else if(totals().sub<c.min)cm={t:`This coupon needs a minimum order of ${money(c.min)}.`,ok:false};
- else{coupon=code;cm={t:`${code} applied: ${c.label}`,ok:true}}
+ else if(!ready)cm={t:"Please wait a moment and try again.",ok:false};
+ else if(!user)cm={t:"Please log in to use a coupon code. Each coupon can be used once per account.",ok:false};
+ else{
+  let used=false;
+  try{used=(await getDoc(doc(db,"couponUses",user.uid+"_"+code))).exists()}
+  catch(e){cm={t:"We couldn't check this coupon. Please try again.",ok:false};render();return}
+  if(used)cm={t:"You have already used this coupon on your account.",ok:false};
+  else{coupon=code;cm={t:`${code} applied: ${c.label} (one-time use per account)`,ok:true}}
+ }
  render();
 }
 function cleanPhone(v){
@@ -282,8 +292,18 @@ async function placeOrder(e){
   pending={saved:false,order:{id:"STZ"+Date.now().toString().slice(-7),date:new Date().toLocaleString("en-IN"),ts:Date.now(),uid:user.uid,username:profile.username,email:profile.email||user.email,name,address:addr,phone,coupon:coupon||null,items:Object.values(cart),...t}};
  }
  if(!pending.saved){
-  try{await setDoc(doc(db,"orders",pending.order.id),pending.order);pending.saved=true}
-  catch(err){return fail("Sorry, we couldn't save your order. Please check your internet and try again.")}
+  const o=pending.order;
+  try{
+   const b=writeBatch(db);b.set(doc(db,"orders",o.id),o);
+   if(o.coupon)b.set(doc(db,"couponUses",user.uid+"_"+o.coupon),{uid:user.uid,code:o.coupon,orderId:o.id,ts:o.ts});
+   await b.commit();pending.saved=true;
+  }catch(err){
+   if(o.coupon){
+    let used=false;try{used=(await getDoc(doc(db,"couponUses",user.uid+"_"+o.coupon))).exists()}catch(x){}
+    if(used){pending=null;coupon=null;cm={t:"You have already used this coupon on your account, so it was removed. Please check the total and place your order again.",ok:false};render();return fail("")}
+   }
+   return fail("Sorry, we couldn't save your order. Please check your internet and try again.");
+  }
  }
  const r=await sendOrder(pending.order);
  if(r=="fail")return fail("Your order is saved, but we couldn't notify our team yet. Please tap Place order again.");
