@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shop · Streezier</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cart · Streezier</title>
 <meta name="description" content="Streezier is a luxury brand. We trust quality nothing more.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23ffd60a'/%3E%3Ctext x='32' y='48' font-size='46' font-weight='900' text-anchor='middle' font-family='Arial' fill='%230a0a0a'%3ES%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;1,800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -122,50 +122,63 @@ footer a{color:var(--yellow);text-decoration:underline}
 </style></head><body>
 <header><div class="wrap"><a class="logo" href="index.html">Streezier</a>
 <form class="sform" id="sform" role="search"><input id="q" type="search" placeholder="Search Streezier" aria-label="Search products"><button type="submit">Search</button></form>
-<nav><a href="index.html" class="">About</a><a href="home.html" class="on">Shop</a><a href="profile.html" class="">Account</a><a href="cart.html" class="">Cart<span class="badge" id="count" hidden>0</span></a></nav></div></header>
+<nav><a href="index.html" class="">About</a><a href="home.html" class="">Shop</a><a href="profile.html" class="">Account</a><a href="cart.html" class="on">Cart<span class="badge" id="count" hidden>0</span></a></nav></div></header>
+<div class="banner"><div class="wrap"><h2>Your cart</h2></div></div>
 <main class="wrap">
-<div id="listView">
-<div class="pagehead"><h1>Shop</h1><p>The Streezier collection</p></div>
-<div class="catbar" id="catbar"></div>
-<div class="head"><h2 id="res"></h2><div class="sorts" id="sorts"><button class="chip" data-s="lo">Price: Low to High</button><button class="chip" data-s="hi">Price: High to Low</button></div></div>
-<div class="grid" id="grid"></div>
+<div class="cols" id="cartView">
+<div>
+<div class="panel" id="items"></div>
+<form class="panel" id="checkout" hidden novalidate style="margin-top:22px"><h3>Delivery details</h3>
+<label for="cname">Full name</label><input id="cname" autocomplete="name" placeholder="Your full name"><div class="err" id="ename"></div>
+<label for="caddr">Full address</label><textarea id="caddr" autocomplete="street-address" placeholder="House / flat no., street, area, landmark, city, state, PIN code"></textarea><div class="err" id="eaddr"></div>
+<label for="cphone">Phone number</label><input id="cphone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="10-digit mobile number"><div class="err" id="ephone"></div>
+<div class="sum total"><span>Amount to pay</span><span id="payAmt"></span></div>
+<button class="btn" id="placeBtn" type="submit" style="width:100%;margin-top:14px">Place order</button><div class="err" id="sendErr"></div>
+<p class="paynote">🔒 Payments are made online and every payment comes with proof of your order.</p></form>
 </div>
-<div id="detailView" hidden></div>
+<aside class="panel" id="summary" style="align-self:start" hidden><h3>Price details</h3>
+<label for="coupon" style="margin-top:6px">Coupon code</label>
+<div class="coupon"><input id="coupon" placeholder="Enter coupon code" autocomplete="off"><button class="btn" type="button" id="applyBtn">Apply</button></div>
+<div class="cmsg" id="cmsg"></div>
+<div class="sum"><span>Subtotal</span><span id="sub"></span></div>
+<div class="sum" id="discRow" hidden><span>Coupon discount</span><span class="free" id="disc"></span></div>
+<div class="sum"><span>Delivery fee</span><span id="fee"></span></div>
+<div class="sum total"><span>Total</span><span id="total"></span></div>
+<div class="nudge" id="nudge"></div>
+<button class="btn" type="button" id="buyBtn" style="width:100%;margin-top:16px">Buy</button>
+<p class="paynote" id="loginNote"></p>
+<p class="paynote">Delivery fees are added according to your area. Delivery is FREE on orders over Rs. 1499 (before coupon).</p></aside>
+</div>
+<div class="done" id="done" hidden></div>
 </main>
 <footer><div class="wrap"><div><strong style="color:#fff">STREEZIER</strong> · WE TRUST QUALITY NOTHING MORE<br>© 2026 Streezier. All rights reserved.</div><div><a href="privacy.html">Privacy Policy</a> · <a href="mailto:support.streezier@gmail.com">support.streezier@gmail.com</a></div></div></footer>
-<script>
-/* ============ HOW TO ADD A PRODUCT ============
-   Copy the template block inside the PRODUCTS list, paste it below the END OF TEMPLATE line
-   (before the closing ];), remove nothing else, and change the values:
-     id          a unique number (1, 2, 3 ... never repeat)
-     name        product title
-     category    any word you like (for example "Bags"). Category buttons appear automatically.
-     price       selling price in Rs. (numbers only)
-     mrp         original price (optional, shows a discount; delete the line if not needed)
-     images      photo file names inside your "images" folder
-     emoji, bg   shown only if a photo is missing (bg = background color)
-     description a short paragraph about the product
-     highlights  key points, each in quotes, separated by commas
-   Put a comma after every product block except the last one.
-================================================= */
-const PRODUCTS=[
-/* ---- TEMPLATE (copy this block) ----
-{
- id:1,
- name:"Product name",
- category:"Category",
- price:4999,
- mrp:5999,
- images:["images/product1_1.jpg","images/product1_2.jpg"],
- emoji:"🖤",
- bg:"#f4f4f2",
- description:"Write a short paragraph about the product here.",
- highlights:["First key point","Second key point","Third key point"]
-},
----- END OF TEMPLATE ---- */
-];
+<script type="module">
 
-/* If a photo is not found, try other common file names before showing the emoji. */
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,updateProfile,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,collection,query,where,getDocs,writeBatch} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyCjp4e3qn_jrMizceBD62a4SuF0wUUeahM",authDomain:"streezier.firebaseapp.com",projectId:"streezier",storageBucket:"streezier.firebasestorage.app",messagingSenderId:"842549278881",appId:"1:842549278881:web:fddf40dd711fd38066d8e0",measurementId:"G-3FGNLJ1302"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+/* ============ ORDER EMAILS (set this up once) ============
+   Every new order is emailed to you through Web3Forms (free, no server needed):
+   1) Go to https://web3forms.com, type YOUR email, and they send you an "Access Key".
+   2) Paste that key between the quotes below. Orders will arrive in that email inbox.
+============================================================ */
+const WEB3FORMS_KEY="c860d935-d65a-4b82-97e7-b70afc2ee056";
+const KEY="streezier_cart",ORDERS="streezier_orders",FREE_ABOVE=1499,FEE=100;
+/* ============ COUPON CODES (edit these) ============
+   Format:  "CODE":{type:"percent",value:10,min:0,label:"10% off"}
+     type  "percent" (value = % off) or "flat" (value = Rs. off)
+     min   minimum cart subtotal needed to use the code (0 = none)
+   Every coupon can be used only ONCE per customer account (enforced by the database).
+   Delete the example below if you don't want any coupon to work yet.
+====================================================== */
+const COUPONS={
+ "WELCOME10":{type:"percent",value:10,min:0,label:"10% off your order"}
+};
+
+/* If a photo is not found, try other common file names (.jpeg, .png, .webp, capital letters,
+   a doubled .jpg.jpg, or the main folder) before showing the emoji instead. */
 const EXTS=["jpg","jpeg","png","webp","JPG","JPEG","PNG"];
 function photoVariants(src){
  const m=src.match(/^(.*\/)?([^\/]+?)(\.[A-Za-z0-9]+)?$/),dir=m[1]||"",base=m[2],out=[];
@@ -177,68 +190,135 @@ window.imgFail=function(img,emoji){
  const orig=img.dataset.orig||(img.dataset.orig=img.getAttribute("src")),i=+(img.dataset.i||0),v=photoVariants(orig);
  if(i<v.length){img.dataset.i=i+1;img.src=v[i]}else img.replaceWith(emoji);
 };
-
 const $=s=>document.querySelector(s);
 const money=n=>"Rs. "+Number(n).toLocaleString("en-IN");
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const imgs=p=>p.images||(p.image?[p.image]:[]);
-const em=p=>p.emoji||"🖤";
-const pic=(u,p)=>`<img src="${esc(u)}" alt="${esc(p.name)}" onerror="imgFail(this,'${em(p)}')">`;
-const media=p=>imgs(p)[0]?pic(imgs(p)[0],p):em(p);
-const S={q:"",c:"All",sort:""};let CUR=null;
-const KEY="streezier_cart";
-let cart={};try{cart=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
-function saveCart(){try{localStorage.setItem(KEY,JSON.stringify(cart))}catch(e){}count()}
-function count(){const n=Object.values(cart).reduce((a,b)=>a+b.qty,0),b=$("#count");b.textContent=n;b.hidden=!n}
-function addToCart(id){
- const p=PRODUCTS.find(x=>String(x.id)===String(id));if(!p)return;
- cart[p.id]=cart[p.id]||{id:p.id,name:p.name,price:p.price,image:imgs(p)[0]||"",emoji:em(p),bg:p.bg||"#f4f4f2",qty:0};
- cart[p.id].qty++;saveCart();
+const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let user=null,profile=null,ready=false,pending=null;
+let cart=read(KEY,{}),coupon=null,cm={t:"",ok:false};
+
+function totals(){
+ const sub=Object.values(cart).reduce((a,p)=>a+p.price*p.qty,0);
+ let disc=0;
+ if(coupon){const c=COUPONS[coupon];disc=c.type=="percent"?Math.round(sub*c.value/100):Math.min(c.value,sub)}
+ const fee=(!sub||sub>FREE_ABOVE)?0:FEE;
+ return{sub,disc,fee,total:sub-disc+fee};
 }
-const cats=()=>[...new Set(PRODUCTS.map(p=>p.category))];
-function renderCats(){
- const c=cats();
- $("#catbar").innerHTML=c.length>1?["All",...c].map(x=>`<button class="chip" data-f="${esc(x)}">${esc(x)}</button>`).join(""):"";
+function setQty(id,q){
+ if(q<1)delete cart[id];else cart[id].qty=q;
+ write(KEY,cart);if(pending&&!pending.saved)pending=null;
+ if(coupon&&totals().sub<COUPONS[coupon].min){coupon=null;cm={t:"Coupon removed: the minimum order amount is no longer met.",ok:false}}
+ render();
 }
-function renderList(){
- $("#sorts").hidden=!PRODUCTS.length;
- if(!PRODUCTS.length){
-  $("#res").textContent="";
-  $("#grid").innerHTML=`<div class="empty" style="grid-column:1/-1"><h3>New collection coming soon</h3><p>We are getting our first Streezier products ready.</p><a class="btn" href="index.html">About Streezier</a></div>`;
-  return;
+function render(){
+ const ids=Object.keys(cart),t=totals(),has=ids.length>0;
+ const n=ids.reduce((a,id)=>a+cart[id].qty,0),b=$("#count");b.textContent=n;b.hidden=!n;
+ $("#items").innerHTML=has?ids.map(id=>{const p=cart[id],em=p.emoji||"🛍️";return `<div class="row"><div class="thumb" style="background:${p.bg||"#e9e7ff"}">${p.image?`<img src="${esc(p.image)}" alt="" onerror="imgFail(this,'${em}')">`:em}</div><div class="info"><strong>${esc(p.name)}</strong><br><span>${money(p.price)} each</span></div><div class="qty"><button aria-label="Decrease quantity" data-dec="${id}">−</button>${p.qty}<button aria-label="Increase quantity" data-inc="${id}">+</button></div><strong>${money(p.price*p.qty)}</strong><button class="link" data-rm="${id}">Remove</button></div>`}).join(""):`<div class="empty">🛒<br>Your cart is empty.<br><br><a class="btn" href="home.html">Start shopping</a></div>`;
+ $("#summary").hidden=!has;
+ if(!has)$("#checkout").hidden=true;
+ const ac=profile;$("#loginNote").innerHTML=!ready?"":ac?`Ordering as <strong>@${esc(ac.username)}</strong>`:`You need to <a href="profile.html?next=cart" style="color:var(--indigo);font-weight:700">log in or sign up</a> to place your order.`;
+ $("#sub").textContent=money(t.sub);
+ $("#discRow").hidden=!t.disc;$("#disc").textContent="− "+money(t.disc);
+ $("#fee").innerHTML=t.fee?money(t.fee):`<s>${money(FEE)}</s><span class="free">FREE</span>`;
+ $("#total").textContent=money(t.total);$("#payAmt").textContent=money(t.total);
+ $("#nudge").hidden=!t.sub||t.sub>FREE_ABOVE;
+ $("#nudge").textContent=`Add ${money(Math.floor(FREE_ABOVE-t.sub)+1)} more to get FREE delivery.`;
+ const m=$("#cmsg");m.className="cmsg "+(cm.t?(cm.ok?"ok":"bad"):"");
+ m.innerHTML=esc(cm.t)+(coupon?` <button class="link" type="button" data-rmc>Remove</button>`:"");
+}
+async function applyCoupon(){
+ const code=$("#coupon").value.trim().toUpperCase(),c=COUPONS[code];
+ if(!code)cm={t:"Please enter a coupon code.",ok:false};
+ else if(!c)cm={t:"This coupon code is not valid.",ok:false};
+ else if(totals().sub<c.min)cm={t:`This coupon needs a minimum order of ${money(c.min)}.`,ok:false};
+ else if(!ready)cm={t:"Please wait a moment and try again.",ok:false};
+ else if(!user)cm={t:"Please log in to use a coupon code. Each coupon can be used once per account.",ok:false};
+ else{
+  let used=false;
+  try{used=(await getDoc(doc(db,"couponUses",user.uid+"_"+code))).exists()}
+  catch(e){cm={t:"We couldn't check this coupon. Please try again.",ok:false};render();return}
+  if(used)cm={t:"You have already used this coupon on your account.",ok:false};
+  else{coupon=code;cm={t:`${code} applied: ${c.label} (one-time use per account)`,ok:true}}
  }
- let l=PRODUCTS.filter(p=>(S.c=="All"||p.category==S.c)&&(p.name+" "+p.category).toLowerCase().includes(S.q.toLowerCase()));
- if(S.sort=="lo")l.sort((a,b)=>a.price-b.price);
- if(S.sort=="hi")l.sort((a,b)=>b.price-a.price);
- $("#res").textContent=`${l.length} product${l.length==1?"":"s"}`+(S.q?` for "${S.q}"`:"")+(S.c!="All"?` in ${S.c}`:"");
- $("#grid").innerHTML=l.length?l.map(p=>`<div class="card" tabindex="0" role="link" data-open="${esc(p.id)}">${p.mrp?`<span class="sale">-${Math.round(100-p.price/p.mrp*100)}%</span>`:""}<div class="thumb" style="background:${p.bg||"#f4f4f2"}">${media(p)}</div><div class="body"><span class="tag">${esc(p.category)}</span><h3>${esc(p.name)}</h3><div class="price">${money(p.price)}${p.mrp?`<span class="mrp">${money(p.mrp)}</span>`:""}</div></div></div>`).join(""):`<div class="empty" style="grid-column:1/-1"><h3>Nothing found</h3><p>Try another word or category.</p></div>`;
- document.querySelectorAll("[data-f]").forEach(b=>b.classList.toggle("on",b.dataset.f==S.c));
- document.querySelectorAll("[data-s]").forEach(b=>b.classList.toggle("on",b.dataset.s==S.sort));
+ render();
 }
-function showDetail(p){
- $("#detailView").innerHTML=`<button class="back" data-back>← Back to shop</button><div class="detail"><div><div class="dimg" id="mainImg" style="background:${p.bg||"#f4f4f2"}">${media(p)}</div>${imgs(p).length>1?`<div class="thumbs">${imgs(p).map((u,i)=>`<img src="${esc(u)}" alt="Photo ${i+1}" data-pic="${esc(u)}" onerror="imgFail(this,'')">`).join("")}</div>`:""}</div><div><span class="tag">${esc(p.category)}</span><h1>${esc(p.name)}</h1><div class="dprice">${money(p.price)}${p.mrp?`<span class="mrp">${money(p.mrp)}</span><span class="off">${Math.round(100-p.price/p.mrp*100)}% off</span>`:""}</div><div class="del">Free shipping over Rs. 1499. Delivery fees are added according to your area.</div><p>${esc(p.description||"")}</p><ul>${(p.highlights||[]).map(h=>`<li>${esc(h)}</li>`).join("")}</ul><div class="two"><button class="btn" data-add="${esc(p.id)}">Add to cart</button><button class="btn" data-buy="${esc(p.id)}">Buy now</button></div></div></div>`;
+function cleanPhone(v){
+ let d=v.replace(/[^\d+]/g,"");
+ if(/^\+?91\d{10}$/.test(d))d=d.slice(-10);else if(/^0\d{10}$/.test(d))d=d.slice(1);
+ return d;
 }
-function route(){
- const p=CUR!==null&&PRODUCTS.find(x=>String(x.id)===String(CUR));
- $("#listView").hidden=!!p;$("#detailView").hidden=!p;
- p?showDetail(p):renderList();
+function orderText(o){
+ const L=o.items.map(p=>`- ${p.qty} x ${p.name} @ ${money(p.price)} = ${money(p.qty*p.price)}`).join("\n");
+ return `NEW ORDER ${o.id}\nDate: ${o.date}\n\nCUSTOMER\nName: ${o.name}\nUsername: @${o.username}\nPhone: ${o.phone}\nEmail: ${o.email}\nAddress: ${o.address}\n\nITEMS\n${L}\n\nSubtotal: ${money(o.sub)}\nCoupon: ${o.coupon?o.coupon+" (- "+money(o.disc)+")":"none"}\nDelivery fee: ${o.fee?money(o.fee):"FREE"}\nTOTAL: ${money(o.total)}\n\nPayment: not collected on the website yet. Contact the customer to confirm payment.`;
+}
+async function sendOrder(o){
+ if(!WEB3FORMS_KEY||WEB3FORMS_KEY.startsWith("PASTE_"))return "off";
+ try{
+  const res=await fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({access_key:WEB3FORMS_KEY,subject:`New Streezier order ${o.id} - ${money(o.total)}`,from_name:"Streezier Website",name:o.name,email:o.email,message:orderText(o)})});
+  const d=await res.json();return d.success?"ok":"fail";
+ }catch(e){return "fail"}
+}
+async function placeOrder(e){
+ e.preventDefault();
+ if(!user||!profile){location="profile.html?next=cart";return}
+ const name=$("#cname").value.trim(),addr=$("#caddr").value.trim(),phone=cleanPhone($("#cphone").value);
+ const en=name.length<2?"Please enter your full name.":"";
+ const ea=addr.length<15?"Please enter your complete address.":!/\b\d{6}\b/.test(addr)?"Please include your 6-digit PIN code.":"";
+ const ep=/^[6-9]\d{9}$/.test(phone)?"":"Please enter a valid 10-digit mobile number.";
+ $("#ename").textContent=en;$("#eaddr").textContent=ea;$("#ephone").textContent=ep;
+ if(en||ea||ep)return;
+ const btn=$("#placeBtn");btn.disabled=true;btn.textContent="Placing order…";$("#sendErr").textContent="";
+ const fail=m=>{$("#sendErr").textContent=m;btn.disabled=false;btn.textContent="Place order"};
+ if(!pending){
+  const t=totals();
+  pending={saved:false,order:{id:"STZ"+Date.now().toString().slice(-7),date:new Date().toLocaleString("en-IN"),ts:Date.now(),uid:user.uid,username:profile.username,email:profile.email||user.email,name,address:addr,phone,coupon:coupon||null,items:Object.values(cart),...t}};
+ }
+ if(!pending.saved){
+  const o=pending.order;
+  try{
+   const b=writeBatch(db);b.set(doc(db,"orders",o.id),o);
+   if(o.coupon)b.set(doc(db,"couponUses",user.uid+"_"+o.coupon),{uid:user.uid,code:o.coupon,orderId:o.id,ts:o.ts});
+   await b.commit();pending.saved=true;
+  }catch(err){
+   if(o.coupon){
+    let used=false;try{used=(await getDoc(doc(db,"couponUses",user.uid+"_"+o.coupon))).exists()}catch(x){}
+    if(used){pending=null;coupon=null;cm={t:"You have already used this coupon on your account, so it was removed. Please check the total and place your order again.",ok:false};render();return fail("")}
+   }
+   return fail("Sorry, we couldn't save your order. Please check your internet and try again.");
+  }
+ }
+ const r=await sendOrder(pending.order);
+ if(r=="fail")return fail("Your order is saved, but we couldn't notify our team yet. Please tap Place order again.");
+ const order=pending.order;
+ pending=null;cart={};coupon=null;cm={t:"",ok:false};write(KEY,cart);render();
+ btn.disabled=false;btn.textContent="Place order";
+ $("#cartView").hidden=true;$("#done").hidden=false;
+ $("#done").innerHTML=(r=="off"?`<div class="notice">⚠ Email is not set up yet, so this order was NOT sent to you. Add your Web3Forms key in cart.html (see ORDER EMAILS).</div>`:"")+`<div class="big">✅</div><h2>Order placed!</h2><p>Thank you, ${esc(order.name)}. Your order ID is <strong>${order.id}</strong>.</p><div class="panel box"><div class="sum"><span>Items</span><span>${order.items.reduce((a,p)=>a+p.qty,0)}</span></div><div class="sum"><span>Delivery fee</span><span>${order.fee?money(order.fee):"FREE"}</span></div><div class="sum total"><span>Total</span><span>${money(order.total)}</span></div><p style="margin:12px 0 0"><strong>Deliver to:</strong><br>${esc(order.name)}<br>${esc(order.address)}<br>Phone: ${esc(order.phone)}</p></div><p class="paynote">Questions? Write to support.streezier@gmail.com with your order ID.</p><br><a class="btn" href="home.html">Continue shopping</a>`;
  window.scrollTo(0,0);
 }
-$("#sform").onsubmit=e=>{e.preventDefault();S.q=$("#q").value.trim();CUR=null;route()};
 document.addEventListener("click",e=>{
- const t=e.target.closest("[data-open],[data-add],[data-buy],[data-back],[data-pic],[data-f],[data-s]");if(!t)return;
+ const t=e.target.closest("[data-inc],[data-dec],[data-rm],[data-rmc]");if(!t)return;
  const d=t.dataset;
- if(d.pic!==undefined){const p=PRODUCTS.find(x=>String(x.id)===String(CUR));$("#mainImg").innerHTML=pic(d.pic,p)}
- else if(d.open!==undefined){CUR=d.open;route()}
- else if(d.back!==undefined){CUR=null;route()}
- else if(d.f!==undefined){S.c=d.f;CUR=null;route()}
- else if(d.s!==undefined){S.sort=S.sort==d.s?"":d.s;renderList()}
- else if(d.add!==undefined){addToCart(d.add);t.textContent="Added ✓";setTimeout(()=>t.textContent="Add to cart",1200)}
- else if(d.buy!==undefined){addToCart(d.buy);location.href="cart.html"}
+ if(d.inc!==undefined)setQty(d.inc,cart[d.inc].qty+1);
+ else if(d.dec!==undefined)setQty(d.dec,cart[d.dec].qty-1);
+ else if(d.rm!==undefined)setQty(d.rm,0);
+ else if(d.rmc!==undefined){coupon=null;cm={t:"",ok:false};$("#coupon").value="";render()}
 });
-document.addEventListener("keydown",e=>{const t=e.target.closest&&e.target.closest("[data-open]");if(t&&e.key=="Enter"){CUR=t.dataset.open;route()}});
-const u=new URLSearchParams(location.search);S.q=u.get("q")||"";$("#q").value=S.q;
-renderCats();
-if(u.get("c")&&cats().includes(u.get("c")))S.c=u.get("c");
-count();route();
+$("#applyBtn").onclick=applyCoupon;
+$("#coupon").onkeydown=e=>{if(e.key=="Enter"){e.preventDefault();applyCoupon()}};
+$("#buyBtn").onclick=()=>{if(!ready)return;const a=profile;if(!a){location="profile.html?next=cart";return}
+ if(!$("#cphone").value)$("#cphone").value=a.phone||"";if(!$("#caddr").value)$("#caddr").value=a.address||"";
+ $("#checkout").hidden=false;$("#checkout").scrollIntoView({behavior:"smooth"});$("#cname").focus()};
+$("#checkout").onsubmit=placeOrder;
+$("#sform").onsubmit=e=>{e.preventDefault();location="home.html?q="+encodeURIComponent($("#q").value.trim())};
+render();
+onAuthStateChanged(auth,async u=>{
+ user=u;profile=null;
+ if(u){
+  try{const s=await getDoc(doc(db,"users",u.uid));profile=s.exists()?s.data():null}catch(e){}
+  if(!profile)profile={username:u.displayName||(u.email||"user").split("@")[0],email:u.email,phone:"",address:""};
+ }
+ ready=true;render();
+});
 </script></body></html>
