@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>We trust quality nothing more · Streezier</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cart · Streezier</title>
 <meta name="description" content="Streezier is a luxury brand. We trust quality nothing more.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23ffd60a'/%3E%3Ctext x='32' y='48' font-size='46' font-weight='900' text-anchor='middle' font-family='Arial' fill='%230a0a0a'%3ES%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;1,800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -122,30 +122,203 @@ footer a{color:var(--yellow);text-decoration:underline}
 </style></head><body>
 <header><div class="wrap"><a class="logo" href="index.html">Streezier</a>
 <form class="sform" id="sform" role="search"><input id="q" type="search" placeholder="Search Streezier" aria-label="Search products"><button type="submit">Search</button></form>
-<nav><a href="index.html" class="on">About</a><a href="home.html" class="">Shop</a><a href="profile.html" class="">Account</a><a href="cart.html" class="">Cart<span class="badge" id="count" hidden>0</span></a></nav></div></header>
-<section class="hero"><div class="wrap"><h1>We trust <span>quality</span> nothing more</h1><p>Streezier is a luxury brand for people who want their everyday to feel exceptional. Bold design, refined detail, made to be noticed.</p><a class="btn" href="home.html">Shop now</a><a class="btn ghost" href="#story">Our story</a></div></section>
-<div class="strip">We trust quality nothing more &nbsp;·&nbsp; Free shipping over Rs. 1499 &nbsp;·&nbsp; Secure online payments</div>
-<section class="sec" id="story"><div class="wrap"><h2 class="t">Who we are</h2><div class="story">
-<p>Streezier was founded on a simple idea: luxury should have personality. Too often, luxury feels distant, quiet and overly serious. We wanted to build a brand that feels confident, modern and alive, where every product carries a clear point of view.</p>
-<p>Our promise is written in our slogan: <strong>we trust quality, nothing more.</strong> It is how we make every decision. We do not chase trends, noise or shortcuts. We put our trust in quality, and we ask every product to earn its place in our collection.</p>
-<p>Everything starts with design. We think carefully about shape, proportion, color and finish, and we keep refining until a product feels right in the hand and looks right in the room. Our colors of black, white and yellow reflect how we think: strong contrast, clean lines and one unmistakable spark of energy.</p>
-<p>We are building Streezier as a brand, not a catalogue. That means fewer products, chosen with care, and a commitment to keep improving them. We want shopping with us to feel as good as the product itself: clear prices, secure online payments, a simple ordering process and a team you can reach when you need us.</p>
-<p>If you like things that are bold, well made and a little bit different, you are exactly who we are designing for. Welcome to Streezier.</p></div></div></section>
-<section class="sec grey"><div class="wrap"><h2 class="t">What we stand for</h2><div class="vals">
-<div class="val"><span class="num">01</span><h3>Quality first</h3><p>Quality is our starting point, not an extra. If it is not good enough, it does not carry our name.</p></div>
-<div class="val"><span class="num">02</span><h3>Bold design</h3><p>Every product begins with a clear idea and a confident shape, made to be noticed.</p></div>
-<div class="val"><span class="num">03</span><h3>Honest service</h3><p>Clear prices, secure payments and a real team that answers when you write to us.</p></div></div></div></section>
-<section class="sec"><div class="wrap"><h2 class="t">How ordering works</h2><div class="steps">
-<div class="step"><span class="num">01</span><h3>Choose</h3><p>Pick your products and check out securely.</p></div>
-<div class="step"><span class="num">02</span><h3>We prepare</h3><p>Your order is prepared and dispatched to you.</p></div>
-<div class="step"><span class="num">03</span><h3>Delivered</h3><p>It arrives at your door. Delivery details are shown at checkout.</p></div></div></div></section>
-<section class="sec dark"><div class="wrap"><h2 class="t">Our promise</h2><div class="why">
-<div class="pbox"><h3>Free shipping over Rs. 1499</h3><p>Below that, delivery fees are added according to your area. The fee is shown clearly before you pay.</p></div>
-<div class="pbox"><h3>Secure online payments</h3><p>All payments are made online, and every order comes with proof of payment.</p></div>
-<div class="pbox"><h3>Support</h3><p>Write to us any time at support.streezier@gmail.com.</p></div></div></div></section>
-<section class="cta"><div class="wrap"><h2>Discover Streezier</h2><a class="btn dark" href="home.html">Shop the collection</a></div></section>
+<nav><a href="index.html" class="">About</a><a href="home.html" class="">Shop</a><a href="profile.html" class="">Account</a><a href="cart.html" class="on">Cart<span class="badge" id="count" hidden>0</span></a></nav></div></header>
+<div class="banner"><div class="wrap"><h2>Your cart</h2></div></div>
+<main class="wrap">
+<div class="cols" id="cartView">
+<div>
+<div class="panel" id="items"></div>
+<form class="panel" id="checkout" hidden novalidate style="margin-top:22px"><h3>Delivery details</h3>
+<label for="cname">Full name</label><input id="cname" autocomplete="name" placeholder="Your full name"><div class="err" id="ename"></div>
+<label for="caddr">Full address</label><textarea id="caddr" autocomplete="street-address" placeholder="House / flat no., street, area, landmark, city, state, PIN code"></textarea><div class="err" id="eaddr"></div>
+<label for="cphone">Phone number</label><input id="cphone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="10-digit mobile number"><div class="err" id="ephone"></div>
+<div class="sum total"><span>Amount to pay</span><span id="payAmt"></span></div>
+<button class="btn" id="placeBtn" type="submit" style="width:100%;margin-top:14px">Place order</button><div class="err" id="sendErr"></div>
+<p class="paynote">🔒 Payments are made online and every payment comes with proof of your order.</p></form>
+</div>
+<aside class="panel" id="summary" style="align-self:start" hidden><h3>Price details</h3>
+<label for="coupon" style="margin-top:6px">Coupon code</label>
+<div class="coupon"><input id="coupon" placeholder="Enter coupon code" autocomplete="off"><button class="btn" type="button" id="applyBtn">Apply</button></div>
+<div class="cmsg" id="cmsg"></div>
+<div class="sum"><span>Subtotal</span><span id="sub"></span></div>
+<div class="sum" id="discRow" hidden><span>Coupon discount</span><span class="free" id="disc"></span></div>
+<div class="sum"><span>Delivery fee</span><span id="fee"></span></div>
+<div class="sum total"><span>Total</span><span id="total"></span></div>
+<div class="nudge" id="nudge"></div>
+<button class="btn" type="button" id="buyBtn" style="width:100%;margin-top:16px">Buy</button>
+<p class="paynote" id="loginNote"></p>
+<p class="paynote">Delivery fees are added according to your area. Delivery is FREE on orders over Rs. 1499 (before coupon).</p></aside>
+</div>
+<div class="done" id="done" hidden></div>
+</main>
 <footer><div class="wrap"><div><strong style="color:#fff">STREEZIER</strong> · WE TRUST QUALITY NOTHING MORE<br>© 2026 Streezier. All rights reserved.</div><div><a href="privacy.html">Privacy Policy</a> · <a href="mailto:support.streezier@gmail.com">support.streezier@gmail.com</a></div></div></footer>
-<script>
-try{const c=JSON.parse(localStorage.getItem("streezier_cart")||"{}"),n=Object.values(c).reduce((a,b)=>a+b.qty,0),b=document.getElementById("count");if(n){b.textContent=n;b.hidden=false}}catch(e){}
-document.getElementById("sform").onsubmit=e=>{e.preventDefault();location="home.html?q="+encodeURIComponent(document.getElementById("q").value.trim())};
+<script type="module">
+
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,updateProfile,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,collection,query,where,getDocs,writeBatch} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyCjp4e3qn_jrMizceBD62a4SuF0wUUeahM",authDomain:"streezier.firebaseapp.com",projectId:"streezier",storageBucket:"streezier.firebasestorage.app",messagingSenderId:"842549278881",appId:"1:842549278881:web:fddf40dd711fd38066d8e0",measurementId:"G-3FGNLJ1302"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+/* ============ ORDER EMAILS (set this up once) ============
+   Every new order is emailed to you through Web3Forms (free, no server needed):
+   1) Go to https://web3forms.com, type YOUR email, and they send you an "Access Key".
+   2) Paste that key between the quotes below. Orders will arrive in that email inbox.
+============================================================ */
+const WEB3FORMS_KEY="c860d935-d65a-4b82-97e7-b70afc2ee056";
+const KEY="streezier_cart",ORDERS="streezier_orders",FREE_ABOVE=1499,FEE=100;
+/* ============ COUPON CODES (edit these) ============
+   Format:  "CODE":{type:"percent",value:10,min:0,label:"10% off"}
+     type  "percent" (value = % off) or "flat" (value = Rs. off)
+     min   minimum cart subtotal needed to use the code (0 = none)
+   Every coupon can be used only ONCE per customer account (enforced by the database).
+   Delete the example below if you don't want any coupon to work yet.
+====================================================== */
+const COUPONS={
+ "WELCOME10":{type:"percent",value:10,min:0,label:"10% off your order"}
+};
+
+/* If a photo is not found, try other common file names (.jpeg, .png, .webp, capital letters,
+   a doubled .jpg.jpg, or the main folder) before showing the emoji instead. */
+const EXTS=["jpg","jpeg","png","webp","JPG","JPEG","PNG"];
+function photoVariants(src){
+ const m=src.match(/^(.*\/)?([^\/]+?)(\.[A-Za-z0-9]+)?$/),dir=m[1]||"",base=m[2],out=[];
+ [dir,""].forEach(d=>EXTS.forEach(e=>{const v=d+base+"."+e;if(v!==src&&!out.includes(v))out.push(v)}));
+ out.push(src+".jpg",src+".png");
+ return out;
+}
+window.imgFail=function(img,emoji){
+ const orig=img.dataset.orig||(img.dataset.orig=img.getAttribute("src")),i=+(img.dataset.i||0),v=photoVariants(orig);
+ if(i<v.length){img.dataset.i=i+1;img.src=v[i]}else img.replaceWith(emoji);
+};
+const $=s=>document.querySelector(s);
+const money=n=>"Rs. "+Number(n).toLocaleString("en-IN");
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let user=null,profile=null,ready=false,pending=null;
+let cart=read(KEY,{}),coupon=null,cm={t:"",ok:false};
+
+function totals(){
+ const sub=Object.values(cart).reduce((a,p)=>a+p.price*p.qty,0);
+ let disc=0;
+ if(coupon){const c=COUPONS[coupon];disc=c.type=="percent"?Math.round(sub*c.value/100):Math.min(c.value,sub)}
+ const fee=(!sub||sub>FREE_ABOVE)?0:FEE;
+ return{sub,disc,fee,total:sub-disc+fee};
+}
+function setQty(id,q){
+ if(q<1)delete cart[id];else cart[id].qty=q;
+ write(KEY,cart);if(pending&&!pending.saved)pending=null;
+ if(coupon&&totals().sub<COUPONS[coupon].min){coupon=null;cm={t:"Coupon removed: the minimum order amount is no longer met.",ok:false}}
+ render();
+}
+function render(){
+ const ids=Object.keys(cart),t=totals(),has=ids.length>0;
+ const n=ids.reduce((a,id)=>a+cart[id].qty,0),b=$("#count");b.textContent=n;b.hidden=!n;
+ $("#items").innerHTML=has?ids.map(id=>{const p=cart[id],em=p.emoji||"🛍️";return `<div class="row"><div class="thumb" style="background:${p.bg||"#e9e7ff"}">${p.image?`<img src="${esc(p.image)}" alt="" onerror="imgFail(this,'${em}')">`:em}</div><div class="info"><strong>${esc(p.name)}</strong><br><span>${money(p.price)} each</span></div><div class="qty"><button aria-label="Decrease quantity" data-dec="${id}">−</button>${p.qty}<button aria-label="Increase quantity" data-inc="${id}">+</button></div><strong>${money(p.price*p.qty)}</strong><button class="link" data-rm="${id}">Remove</button></div>`}).join(""):`<div class="empty">🛒<br>Your cart is empty.<br><br><a class="btn" href="home.html">Start shopping</a></div>`;
+ $("#summary").hidden=!has;
+ if(!has)$("#checkout").hidden=true;
+ const ac=profile;$("#loginNote").innerHTML=!ready?"":ac?`Ordering as <strong>@${esc(ac.username)}</strong>`:`You need to <a href="profile.html?next=cart" style="color:var(--indigo);font-weight:700">log in or sign up</a> to place your order.`;
+ $("#sub").textContent=money(t.sub);
+ $("#discRow").hidden=!t.disc;$("#disc").textContent="− "+money(t.disc);
+ $("#fee").innerHTML=t.fee?money(t.fee):`<s>${money(FEE)}</s><span class="free">FREE</span>`;
+ $("#total").textContent=money(t.total);$("#payAmt").textContent=money(t.total);
+ $("#nudge").hidden=!t.sub||t.sub>FREE_ABOVE;
+ $("#nudge").textContent=`Add ${money(Math.floor(FREE_ABOVE-t.sub)+1)} more to get FREE delivery.`;
+ const m=$("#cmsg");m.className="cmsg "+(cm.t?(cm.ok?"ok":"bad"):"");
+ m.innerHTML=esc(cm.t)+(coupon?` <button class="link" type="button" data-rmc>Remove</button>`:"");
+}
+async function applyCoupon(){
+ const code=$("#coupon").value.trim().toUpperCase(),c=COUPONS[code];
+ if(!code)cm={t:"Please enter a coupon code.",ok:false};
+ else if(!c)cm={t:"This coupon code is not valid.",ok:false};
+ else if(totals().sub<c.min)cm={t:`This coupon needs a minimum order of ${money(c.min)}.`,ok:false};
+ else if(!ready)cm={t:"Please wait a moment and try again.",ok:false};
+ else if(!user)cm={t:"Please log in to use a coupon code. Each coupon can be used once per account.",ok:false};
+ else{
+  let used=false;
+  try{used=(await getDoc(doc(db,"couponUses",user.uid+"_"+code))).exists()}
+  catch(e){cm={t:"We couldn't check this coupon. Please try again.",ok:false};render();return}
+  if(used)cm={t:"You have already used this coupon on your account.",ok:false};
+  else{coupon=code;cm={t:`${code} applied: ${c.label} (one-time use per account)`,ok:true}}
+ }
+ render();
+}
+function cleanPhone(v){
+ let d=v.replace(/[^\d+]/g,"");
+ if(/^\+?91\d{10}$/.test(d))d=d.slice(-10);else if(/^0\d{10}$/.test(d))d=d.slice(1);
+ return d;
+}
+function orderText(o){
+ const L=o.items.map(p=>`- ${p.qty} x ${p.name} @ ${money(p.price)} = ${money(p.qty*p.price)}`).join("\n");
+ return `NEW ORDER ${o.id}\nDate: ${o.date}\n\nCUSTOMER\nName: ${o.name}\nUsername: @${o.username}\nPhone: ${o.phone}\nEmail: ${o.email}\nAddress: ${o.address}\n\nITEMS\n${L}\n\nSubtotal: ${money(o.sub)}\nCoupon: ${o.coupon?o.coupon+" (- "+money(o.disc)+")":"none"}\nDelivery fee: ${o.fee?money(o.fee):"FREE"}\nTOTAL: ${money(o.total)}\n\nPayment: not collected on the website yet. Contact the customer to confirm payment.`;
+}
+async function sendOrder(o){
+ if(!WEB3FORMS_KEY||WEB3FORMS_KEY.startsWith("PASTE_"))return "off";
+ try{
+  const res=await fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({access_key:WEB3FORMS_KEY,subject:`New Streezier order ${o.id} - ${money(o.total)}`,from_name:"Streezier Website",name:o.name,email:o.email,message:orderText(o)})});
+  const d=await res.json();return d.success?"ok":"fail";
+ }catch(e){return "fail"}
+}
+async function placeOrder(e){
+ e.preventDefault();
+ if(!user||!profile){location="profile.html?next=cart";return}
+ const name=$("#cname").value.trim(),addr=$("#caddr").value.trim(),phone=cleanPhone($("#cphone").value);
+ const en=name.length<2?"Please enter your full name.":"";
+ const ea=addr.length<15?"Please enter your complete address.":!/\b\d{6}\b/.test(addr)?"Please include your 6-digit PIN code.":"";
+ const ep=/^[6-9]\d{9}$/.test(phone)?"":"Please enter a valid 10-digit mobile number.";
+ $("#ename").textContent=en;$("#eaddr").textContent=ea;$("#ephone").textContent=ep;
+ if(en||ea||ep)return;
+ const btn=$("#placeBtn");btn.disabled=true;btn.textContent="Placing order…";$("#sendErr").textContent="";
+ const fail=m=>{$("#sendErr").textContent=m;btn.disabled=false;btn.textContent="Place order"};
+ if(!pending){
+  const t=totals();
+  pending={saved:false,order:{id:"STZ"+Date.now().toString().slice(-7),date:new Date().toLocaleString("en-IN"),ts:Date.now(),uid:user.uid,username:profile.username,email:profile.email||user.email,name,address:addr,phone,coupon:coupon||null,items:Object.values(cart),...t}};
+ }
+ if(!pending.saved){
+  const o=pending.order;
+  try{
+   const b=writeBatch(db);b.set(doc(db,"orders",o.id),o);
+   if(o.coupon)b.set(doc(db,"couponUses",user.uid+"_"+o.coupon),{uid:user.uid,code:o.coupon,orderId:o.id,ts:o.ts});
+   await b.commit();pending.saved=true;
+  }catch(err){
+   if(o.coupon){
+    let used=false;try{used=(await getDoc(doc(db,"couponUses",user.uid+"_"+o.coupon))).exists()}catch(x){}
+    if(used){pending=null;coupon=null;cm={t:"You have already used this coupon on your account, so it was removed. Please check the total and place your order again.",ok:false};render();return fail("")}
+   }
+   return fail("Sorry, we couldn't save your order. Please check your internet and try again.");
+  }
+ }
+ const r=await sendOrder(pending.order);
+ if(r=="fail")return fail("Your order is saved, but we couldn't notify our team yet. Please tap Place order again.");
+ const order=pending.order;
+ pending=null;cart={};coupon=null;cm={t:"",ok:false};write(KEY,cart);render();
+ btn.disabled=false;btn.textContent="Place order";
+ $("#cartView").hidden=true;$("#done").hidden=false;
+ $("#done").innerHTML=(r=="off"?`<div class="notice">⚠ Email is not set up yet, so this order was NOT sent to you. Add your Web3Forms key in cart.html (see ORDER EMAILS).</div>`:"")+`<div class="big">✅</div><h2>Order placed!</h2><p>Thank you, ${esc(order.name)}. Your order ID is <strong>${order.id}</strong>.</p><div class="panel box"><div class="sum"><span>Items</span><span>${order.items.reduce((a,p)=>a+p.qty,0)}</span></div><div class="sum"><span>Delivery fee</span><span>${order.fee?money(order.fee):"FREE"}</span></div><div class="sum total"><span>Total</span><span>${money(order.total)}</span></div><p style="margin:12px 0 0"><strong>Deliver to:</strong><br>${esc(order.name)}<br>${esc(order.address)}<br>Phone: ${esc(order.phone)}</p></div><p class="paynote">Questions? Write to support.streezier@gmail.com with your order ID.</p><br><a class="btn" href="home.html">Continue shopping</a>`;
+ window.scrollTo(0,0);
+}
+document.addEventListener("click",e=>{
+ const t=e.target.closest("[data-inc],[data-dec],[data-rm],[data-rmc]");if(!t)return;
+ const d=t.dataset;
+ if(d.inc!==undefined)setQty(d.inc,cart[d.inc].qty+1);
+ else if(d.dec!==undefined)setQty(d.dec,cart[d.dec].qty-1);
+ else if(d.rm!==undefined)setQty(d.rm,0);
+ else if(d.rmc!==undefined){coupon=null;cm={t:"",ok:false};$("#coupon").value="";render()}
+});
+$("#applyBtn").onclick=applyCoupon;
+$("#coupon").onkeydown=e=>{if(e.key=="Enter"){e.preventDefault();applyCoupon()}};
+$("#buyBtn").onclick=()=>{if(!ready)return;const a=profile;if(!a){location="profile.html?next=cart";return}
+ if(!$("#cphone").value)$("#cphone").value=a.phone||"";if(!$("#caddr").value)$("#caddr").value=a.address||"";
+ $("#checkout").hidden=false;$("#checkout").scrollIntoView({behavior:"smooth"});$("#cname").focus()};
+$("#checkout").onsubmit=placeOrder;
+$("#sform").onsubmit=e=>{e.preventDefault();location="home.html?q="+encodeURIComponent($("#q").value.trim())};
+render();
+onAuthStateChanged(auth,async u=>{
+ user=u;profile=null;
+ if(u){
+  try{const s=await getDoc(doc(db,"users",u.uid));profile=s.exists()?s.data():null}catch(e){}
+  if(!profile)profile={username:u.displayName||(u.email||"user").split("@")[0],email:u.email,phone:"",address:""};
+ }
+ ready=true;render();
+});
 </script></body></html>
